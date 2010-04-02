@@ -1,0 +1,14 @@
+prune csc/realm
+prune csc/threads
+prune csc/nl/mblem/en_unlem
+prune csc/nl/lemmatize/setup
+include csc/nl/mblem/*.pickle
+include csc/nl/en/*.txt
+include csc/nl/es/stop.txt
+include csc/nl/hu/stop.txt
+include csc/nl/pt/stop.txt
+include csc/nl/ja/README.txt
+include manage.py
+include tools
+include test
+include serialize

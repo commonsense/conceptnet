@@ -1,0 +1,433 @@
+<html>
+<head>
+<title>csc.conceptnet4.analogyspace</title>
+</head>
+<body>
+csc.conceptnet4.analogyspace
+<style>
+.coverage pre {float: left; margin: 0px 1em; border: none;
+               padding: 0px; }
+.num pre { margin: 0px }
+.nocov, .nocov pre {background-color: #faa}
+.cov, .cov pre {background-color: #cfc}
+div.coverage div { clear: both; height: 1.1em}
+</style>
+<div class="stats">
+Covered: 151 lines<br/>
+Missed: 134 lines<br/>
+Skipped 123 lines<br/>
+Percent: 52 %<br/>
+
+</div>
+<div class="coverage">
+<div class="cov"><span class="num"><pre>  1</pre></span><pre>from csc.divisi.tensor import DictTensor</pre></div>
+<div class="cov"><span class="num"><pre>  2</pre></span><pre>from csc.divisi.labeled_view import LabeledView</pre></div>
+<div class="cov"><span class="num"><pre>  3</pre></span><pre>from csc.divisi.ordered_set import OrderedSet</pre></div>
+<div class="cov"><span class="num"><pre>  4</pre></span><pre>from csc.divisi.blend import Blend</pre></div>
+<div class="cov"><span class="num"><pre>  5</pre></span><pre>from csc.conceptnet4.models import Assertion, Relation</pre></div>
+<div class="cov"><span class="num"><pre>  6</pre></span><pre>from math import log, sqrt</pre></div>
+<div class="cov"><span class="num"><pre>  7</pre></span><pre>import logging</pre></div>
+<div class="skip"><span class="num"><pre>  8</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>  9</pre></span><pre>DEFAULT_IDENTITY_WEIGHT = sqrt(5)</pre></div>
+<div class="cov"><span class="num"><pre> 10</pre></span><pre>DEFAULT_CUTOFF = 5</pre></div>
+<div class="skip"><span class="num"><pre> 11</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 12</pre></span><pre>log_2 = log(2)</pre></div>
+<div class="skip"><span class="num"><pre> 13</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre> 14</pre></span><pre>###</pre></div>
+<div class="skip"><span class="num"><pre> 15</pre></span><pre>### General utilities</pre></div>
+<div class="skip"><span class="num"><pre> 16</pre></span><pre>###</pre></div>
+<div class="skip"><span class="num"><pre> 17</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 18</pre></span><pre>relation_name_cache = None</pre></div>
+<div class="cov"><span class="num"><pre> 19</pre></span><pre>def get_relation_names():</pre></div>
+<div class="cov"><span class="num"><pre> 20</pre></span><pre>    global relation_name_cache</pre></div>
+<div class="nocov"><span class="num"><pre> 21</pre></span><pre>    if relation_name_cache is None:</pre></div>
+<div class="nocov"><span class="num"><pre> 22</pre></span><pre>        relation_name_cache = dict((x.id, x.name)</pre></div>
+<div class="nocov"><span class="num"><pre> 23</pre></span><pre>                                   for x in Relation.objects.all())</pre></div>
+<div class="nocov"><span class="num"><pre> 24</pre></span><pre>    return relation_name_cache</pre></div>
+<div class="skip"><span class="num"><pre> 25</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 26</pre></span><pre>def get_value(score, freq):</pre></div>
+<div class="nocov"><span class="num"><pre> 27</pre></span><pre>    return freq * log(max((score+1, 1)))/log_2 / 10.0</pre></div>
+<div class="skip"><span class="num"><pre> 28</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 29</pre></span><pre>def conceptnet_triples(lang, cutoff=DEFAULT_CUTOFF, value_for_score_and_freq=get_value, extra_filters=None):</pre></div>
+<div class="cov"><span class="num"><pre> 30</pre></span><pre>    '''</pre></div>
+<div class="cov"><span class="num"><pre> 31</pre></span><pre>    Generates a sequence of ((concept, relation, concept), value) triples for ConceptNet in the given language.</pre></div>
+<div class="cov"><span class="num"><pre> 32</pre></span><pre>    '''</pre></div>
+<div class="nocov"><span class="num"><pre> 33</pre></span><pre>    queryset = conceptnet_queryset(lang, cutoff=cutoff)</pre></div>
+<div class="nocov"><span class="num"><pre> 34</pre></span><pre>    if extra_filters is not None:</pre></div>
+<div class="nocov"><span class="num"><pre> 35</pre></span><pre>        queryset = queryset.filter(extra_filters)</pre></div>
+<div class="nocov"><span class="num"><pre> 36</pre></span><pre>    for (relation, concept1, concept2, score, freq) in queryset.values_list(</pre></div>
+<div class="nocov"><span class="num"><pre> 37</pre></span><pre>        'relation__name', 'concept1__text', 'concept2__text', 'score', 'frequency__value').iterator():</pre></div>
+<div class="nocov"><span class="num"><pre> 38</pre></span><pre>        yield (concept1, relation, concept2), value_for_score_and_freq(score, freq)</pre></div>
+<div class="skip"><span class="num"><pre> 39</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 40</pre></span><pre>def conceptnet_queryset(lang=None, cutoff=DEFAULT_CUTOFF):</pre></div>
+<div class="nocov"><span class="num"><pre> 41</pre></span><pre>    queryset = Assertion.objects.filter(score__gt=0)</pre></div>
+<div class="nocov"><span class="num"><pre> 42</pre></span><pre>    if cutoff:</pre></div>
+<div class="nocov"><span class="num"><pre> 43</pre></span><pre>        queryset = queryset.filter(</pre></div>
+<div class="nocov"><span class="num"><pre> 44</pre></span><pre>            concept1__num_assertions__gt=cutoff,</pre></div>
+<div class="nocov"><span class="num"><pre> 45</pre></span><pre>            concept2__num_assertions__gt=cutoff)</pre></div>
+<div class="nocov"><span class="num"><pre> 46</pre></span><pre>    if lang is not None:</pre></div>
+<div class="nocov"><span class="num"><pre> 47</pre></span><pre>        queryset = queryset.filter(language=lang)</pre></div>
+<div class="nocov"><span class="num"><pre> 48</pre></span><pre>    return queryset</pre></div>
+<div class="skip"><span class="num"><pre> 49</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre> 50</pre></span><pre>###</pre></div>
+<div class="skip"><span class="num"><pre> 51</pre></span><pre>### Building AnalogySpace</pre></div>
+<div class="skip"><span class="num"><pre> 52</pre></span><pre>###</pre></div>
+<div class="skip"><span class="num"><pre> 53</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 54</pre></span><pre>class ConceptNet2DTensor(LabeledView):</pre></div>
+<div class="cov"><span class="num"><pre> 55</pre></span><pre>    def __init__(self):</pre></div>
+<div class="cov"><span class="num"><pre> 56</pre></span><pre>        super(ConceptNet2DTensor, self).__init__(</pre></div>
+<div class="cov"><span class="num"><pre> 57</pre></span><pre>            DictTensor(2), [OrderedSet() for _ in '01'])</pre></div>
+<div class="skip"><span class="num"><pre> 58</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 59</pre></span><pre>    def add_assertion(self, relation, left, right, value):</pre></div>
+<div class="skip"><span class="num"><pre> 60</pre></span><pre>        # FIXME: doesn't actually add. Need to evaluate the impact of that before changing.</pre></div>
+<div class="cov"><span class="num"><pre> 61</pre></span><pre>        lfeature = ('left',relation,left)</pre></div>
+<div class="cov"><span class="num"><pre> 62</pre></span><pre>        rfeature = ('right',relation,right)</pre></div>
+<div class="cov"><span class="num"><pre> 63</pre></span><pre>        self[left, rfeature] = value</pre></div>
+<div class="cov"><span class="num"><pre> 64</pre></span><pre>        self[right, lfeature] = value</pre></div>
+<div class="skip"><span class="num"><pre> 65</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 66</pre></span><pre>    def add_identity_assertion(self, relation, text, value):</pre></div>
+<div class="cov"><span class="num"><pre> 67</pre></span><pre>        self.add_assertion(relation, text, text, value)</pre></div>
+<div class="skip"><span class="num"><pre> 68</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 69</pre></span><pre>    def to_labeled_view(self):</pre></div>
+<div class="cov"><span class="num"><pre> 70</pre></span><pre>        return LabeledView(self.tensor, self._labels)</pre></div>
+<div class="skip"><span class="num"><pre> 71</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre> 72</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 73</pre></span><pre>class ConceptNet3DTensor(LabeledView):</pre></div>
+<div class="cov"><span class="num"><pre> 74</pre></span><pre>    def __init__(self):</pre></div>
+<div class="nocov"><span class="num"><pre> 75</pre></span><pre>        concepts, relations = OrderedSet(), OrderedSet()</pre></div>
+<div class="nocov"><span class="num"><pre> 76</pre></span><pre>        super(ConceptNet3DTensor, self).__init__(</pre></div>
+<div class="nocov"><span class="num"><pre> 77</pre></span><pre>            DictTensor(3), [concepts, relations, concepts])</pre></div>
+<div class="skip"><span class="num"><pre> 78</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 79</pre></span><pre>    def add_assertion(self, relation, left, right, value):</pre></div>
+<div class="nocov"><span class="num"><pre> 80</pre></span><pre>        self[left, relation, right] += value</pre></div>
+<div class="skip"><span class="num"><pre> 81</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 82</pre></span><pre>    def add_identity_assertion(self, relation, text, value):</pre></div>
+<div class="nocov"><span class="num"><pre> 83</pre></span><pre>        self[text, relation, text] += value</pre></div>
+<div class="skip"><span class="num"><pre> 84</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre> 85</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 86</pre></span><pre>class MirroringCNet3DTensor(ConceptNet3DTensor):</pre></div>
+<div class="cov"><span class="num"><pre> 87</pre></span><pre>    '''</pre></div>
+<div class="cov"><span class="num"><pre> 88</pre></span><pre>    Every assertion (c1, r, c2) in this tensor has an inverse,</pre></div>
+<div class="cov"><span class="num"><pre> 89</pre></span><pre>    (c2, r', c1).</pre></div>
+<div class="skip"><span class="num"><pre> 90</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 91</pre></span><pre>    This is analogous to how the 2D tensor makes left and right features.</pre></div>
+<div class="skip"><span class="num"><pre> 92</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 93</pre></span><pre>    Inverse relations are constructed from ordinary relations by</pre></div>
+<div class="cov"><span class="num"><pre> 94</pre></span><pre>    prefixing a '-'.</pre></div>
+<div class="cov"><span class="num"><pre> 95</pre></span><pre>    '''</pre></div>
+<div class="cov"><span class="num"><pre> 96</pre></span><pre>    def add_assertion(self, relation, left, right, value):</pre></div>
+<div class="nocov"><span class="num"><pre> 97</pre></span><pre>        self[left, relation, right] += value # normal</pre></div>
+<div class="nocov"><span class="num"><pre> 98</pre></span><pre>        self[right, '-'+relation, left] += value # inverse</pre></div>
+<div class="skip"><span class="num"><pre> 99</pre></span><pre>        </pre></div>
+<div class="skip"><span class="num"><pre>100</pre></span><pre>    </pre></div>
+<div class="skip"><span class="num"><pre>101</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>102</pre></span><pre>class AnalogySpaceBuilder(object):</pre></div>
+<div class="cov"><span class="num"><pre>103</pre></span><pre>    @classmethod</pre></div>
+<div class="cov"><span class="num"><pre>104</pre></span><pre>    def build(cls, **kw):</pre></div>
+<div class="nocov"><span class="num"><pre>105</pre></span><pre>        return cls(**kw)()</pre></div>
+<div class="skip"><span class="num"><pre>106</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>107</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>108</pre></span><pre>    def __init__(self,</pre></div>
+<div class="cov"><span class="num"><pre>109</pre></span><pre>                 identity_weight=DEFAULT_IDENTITY_WEIGHT,</pre></div>
+<div class="cov"><span class="num"><pre>110</pre></span><pre>                 identity_relation=u'InheritsFrom',</pre></div>
+<div class="cov"><span class="num"><pre>111</pre></span><pre>                 cutoff=DEFAULT_CUTOFF,</pre></div>
+<div class="cov"><span class="num"><pre>112</pre></span><pre>                 tensor_class=ConceptNet2DTensor):</pre></div>
+<div class="cov"><span class="num"><pre>113</pre></span><pre>        self.identity_weight = identity_weight</pre></div>
+<div class="cov"><span class="num"><pre>114</pre></span><pre>        self.identity_relation = identity_relation</pre></div>
+<div class="cov"><span class="num"><pre>115</pre></span><pre>        self.cutoff = cutoff</pre></div>
+<div class="cov"><span class="num"><pre>116</pre></span><pre>        self.tensor_class = tensor_class</pre></div>
+<div class="skip"><span class="num"><pre>117</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>118</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>119</pre></span><pre>    def __call__(self):</pre></div>
+<div class="cov"><span class="num"><pre>120</pre></span><pre>        '''Builds a ConceptNet tensor from the database.'''</pre></div>
+<div class="cov"><span class="num"><pre>121</pre></span><pre>        tensor = self.queryset_to_tensor(self.queryset())</pre></div>
+<div class="cov"><span class="num"><pre>122</pre></span><pre>        self.add_identities(tensor)</pre></div>
+<div class="cov"><span class="num"><pre>123</pre></span><pre>        return tensor</pre></div>
+<div class="skip"><span class="num"><pre>124</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>125</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>126</pre></span><pre>    def queryset(self):</pre></div>
+<div class="cov"><span class="num"><pre>127</pre></span><pre>        return Assertion.objects.filter(</pre></div>
+<div class="cov"><span class="num"><pre>128</pre></span><pre>            score__gt=0,</pre></div>
+<div class="cov"><span class="num"><pre>129</pre></span><pre>            concept1__num_assertions__gt=self.cutoff,</pre></div>
+<div class="cov"><span class="num"><pre>130</pre></span><pre>            concept2__num_assertions__gt=self.cutoff)</pre></div>
+<div class="skip"><span class="num"><pre>131</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>132</pre></span><pre>    @staticmethod</pre></div>
+<div class="cov"><span class="num"><pre>133</pre></span><pre>    def get_value(score, freq):</pre></div>
+<div class="cov"><span class="num"><pre>134</pre></span><pre>        return freq * log(max((score+1, 1)))/log_2 / 10.0</pre></div>
+<div class="skip"><span class="num"><pre>135</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>136</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>137</pre></span><pre>    def queryset_to_tensor(self, queryset):</pre></div>
+<div class="cov"><span class="num"><pre>138</pre></span><pre>        '''Returns the tensor (without identities) built from the</pre></div>
+<div class="cov"><span class="num"><pre>139</pre></span><pre>        assertions in the given queryset.'''</pre></div>
+<div class="cov"><span class="num"><pre>140</pre></span><pre>        tensor = self.tensor_class()</pre></div>
+<div class="cov"><span class="num"><pre>141</pre></span><pre>        addToTensor = tensor.add_assertion</pre></div>
+<div class="cov"><span class="num"><pre>142</pre></span><pre>        get_value = self.get_value</pre></div>
+<div class="cov"><span class="num"><pre>143</pre></span><pre>        for (relation, concept1, concept2, score, freq) in queryset.values_list(</pre></div>
+<div class="cov"><span class="num"><pre>144</pre></span><pre>            'relation__name', 'concept1__text',  'concept2__text',  'score',</pre></div>
+<div class="cov"><span class="num"><pre>145</pre></span><pre>            'frequency__value').iterator():</pre></div>
+<div class="cov"><span class="num"><pre>146</pre></span><pre>            value = get_value(score, freq)</pre></div>
+<div class="cov"><span class="num"><pre>147</pre></span><pre>            addToTensor(relation, concept1, concept2, value)</pre></div>
+<div class="cov"><span class="num"><pre>148</pre></span><pre>        return tensor</pre></div>
+<div class="skip"><span class="num"><pre>149</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>150</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>151</pre></span><pre>    def add_identities(self, tensor):</pre></div>
+<div class="cov"><span class="num"><pre>152</pre></span><pre>        weight = self.identity_weight</pre></div>
+<div class="cov"><span class="num"><pre>153</pre></span><pre>        if weight == 0:</pre></div>
+<div class="nocov"><span class="num"><pre>154</pre></span><pre>            logging.info('Skipping adding zero-weight identities.')</pre></div>
+<div class="nocov"><span class="num"><pre>155</pre></span><pre>            return</pre></div>
+<div class="skip"><span class="num"><pre>156</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>157</pre></span><pre>        rel = self.identity_relation</pre></div>
+<div class="cov"><span class="num"><pre>158</pre></span><pre>        add_identity_assertion = tensor.add_identity_assertion</pre></div>
+<div class="cov"><span class="num"><pre>159</pre></span><pre>        logging.info('Adding identities, weight=%s', weight)</pre></div>
+<div class="cov"><span class="num"><pre>160</pre></span><pre>        for text in list(tensor.label_list(0)):</pre></div>
+<div class="cov"><span class="num"><pre>161</pre></span><pre>            add_identity_assertion(rel, text, weight)</pre></div>
+<div class="skip"><span class="num"><pre>162</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>163</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>164</pre></span><pre>class MonolingualAnalogySpaceBuilder(AnalogySpaceBuilder):</pre></div>
+<div class="cov"><span class="num"><pre>165</pre></span><pre>    @classmethod</pre></div>
+<div class="cov"><span class="num"><pre>166</pre></span><pre>    def build(cls, lang, **kw):</pre></div>
+<div class="nocov"><span class="num"><pre>167</pre></span><pre>        return cls(lang=lang, **kw)()</pre></div>
+<div class="skip"><span class="num"><pre>168</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>169</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>170</pre></span><pre>    def __init__(self, lang, **kw):</pre></div>
+<div class="cov"><span class="num"><pre>171</pre></span><pre>        super(MonolingualAnalogySpaceBuilder, self).__init__(**kw)</pre></div>
+<div class="cov"><span class="num"><pre>172</pre></span><pre>        self.lang = lang</pre></div>
+<div class="skip"><span class="num"><pre>173</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>174</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>175</pre></span><pre>    def queryset(self):</pre></div>
+<div class="cov"><span class="num"><pre>176</pre></span><pre>        return super(MonolingualAnalogySpaceBuilder, self).queryset().filter(language=self.lang)</pre></div>
+<div class="skip"><span class="num"><pre>177</pre></span><pre>    </pre></div>
+<div class="skip"><span class="num"><pre>178</pre></span><pre>            </pre></div>
+<div class="skip"><span class="num"><pre>179</pre></span><pre># Experiment: an AnalogySpace from frames</pre></div>
+<div class="cov"><span class="num"><pre>180</pre></span><pre>class FramedTensorBuilder(MonolingualAnalogySpaceBuilder):</pre></div>
+<div class="cov"><span class="num"><pre>181</pre></span><pre>    def queryset_to_tensor(self, queryset):</pre></div>
+<div class="nocov"><span class="num"><pre>182</pre></span><pre>        tensor = self.tensor_class()</pre></div>
+<div class="nocov"><span class="num"><pre>183</pre></span><pre>        add_assertion = tensor.add_assertion</pre></div>
+<div class="nocov"><span class="num"><pre>184</pre></span><pre>        get_value = self.get_value</pre></div>
+<div class="skip"><span class="num"><pre>185</pre></span><pre></pre></div>
+<div class="nocov"><span class="num"><pre>186</pre></span><pre>        for (rel, concept1, concept2, text1, text2, frame_id, score, freq) in queryset.values_list(</pre></div>
+<div class="nocov"><span class="num"><pre>187</pre></span><pre>            'relation__name', 'concept1__text',  'concept2__text', 'text1', 'text2', 'frame_id', 'score', 'frequency__value'</pre></div>
+<div class="nocov"><span class="num"><pre>188</pre></span><pre>            ).iterator():</pre></div>
+<div class="nocov"><span class="num"><pre>189</pre></span><pre>            value = get_value(score, freq)</pre></div>
+<div class="skip"><span class="num"><pre>190</pre></span><pre>            # Raw</pre></div>
+<div class="nocov"><span class="num"><pre>191</pre></span><pre>            add_assertion(frame_id, text1, text2, value)</pre></div>
+<div class="skip"><span class="num"><pre>192</pre></span><pre>            # Assertion</pre></div>
+<div class="nocov"><span class="num"><pre>193</pre></span><pre>            add_assertion(rel, concept1, concept2, value)</pre></div>
+<div class="skip"><span class="num"><pre>194</pre></span><pre>            # NormalizesTo</pre></div>
+<div class="nocov"><span class="num"><pre>195</pre></span><pre>            add_assertion('NormalizesTo', concept1, text1, 1)</pre></div>
+<div class="nocov"><span class="num"><pre>196</pre></span><pre>            add_assertion('NormalizesTo', concept2, text2, 1)</pre></div>
+<div class="nocov"><span class="num"><pre>197</pre></span><pre>            add_assertion('NormalizesTo', concept1, concept1, 1)</pre></div>
+<div class="nocov"><span class="num"><pre>198</pre></span><pre>            add_assertion('NormalizesTo', concept2, concept2, 1)</pre></div>
+<div class="nocov"><span class="num"><pre>199</pre></span><pre>        return tensor</pre></div>
+<div class="skip"><span class="num"><pre>200</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>201</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>202</pre></span><pre># Experiment: Multilingual AnalogySpace</pre></div>
+<div class="cov"><span class="num"><pre>203</pre></span><pre>class MultilingualAnalogySpaceBuilder(AnalogySpaceBuilder):</pre></div>
+<div class="cov"><span class="num"><pre>204</pre></span><pre>    def queryset_to_tensor(self, queryset):</pre></div>
+<div class="nocov"><span class="num"><pre>205</pre></span><pre>        tensor = self.tensor_class()</pre></div>
+<div class="nocov"><span class="num"><pre>206</pre></span><pre>        add_assertion = tensor.add_assertion</pre></div>
+<div class="nocov"><span class="num"><pre>207</pre></span><pre>        get_value = self.get_value</pre></div>
+<div class="skip"><span class="num"><pre>208</pre></span><pre></pre></div>
+<div class="nocov"><span class="num"><pre>209</pre></span><pre>        relation_name = get_relation_names()</pre></div>
+<div class="nocov"><span class="num"><pre>210</pre></span><pre>        for (rel_id, name1, name2, score, freq, lang) in queryset.values_list(</pre></div>
+<div class="nocov"><span class="num"><pre>211</pre></span><pre>            'relation_id', 'concept1__text',  'concept2__text',  'score', 'frequency__value', 'language_id').iterator():</pre></div>
+<div class="skip"><span class="num"><pre>212</pre></span><pre></pre></div>
+<div class="nocov"><span class="num"><pre>213</pre></span><pre>            value = get_value(score, freq)</pre></div>
+<div class="nocov"><span class="num"><pre>214</pre></span><pre>            relation = relation_name[rel_id]</pre></div>
+<div class="nocov"><span class="num"><pre>215</pre></span><pre>            lconcept = (name1, lang)</pre></div>
+<div class="nocov"><span class="num"><pre>216</pre></span><pre>            rconcept = (name2, lang)</pre></div>
+<div class="nocov"><span class="num"><pre>217</pre></span><pre>            add_assertion(relation, lconcept, rconcept, value)</pre></div>
+<div class="nocov"><span class="num"><pre>218</pre></span><pre>        return tensor</pre></div>
+<div class="skip"><span class="num"><pre>219</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>220</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>221</pre></span><pre># Experiment: One relation type at a time</pre></div>
+<div class="cov"><span class="num"><pre>222</pre></span><pre>class ByRelationBuilder(MonolingualAnalogySpaceBuilder):</pre></div>
+<div class="cov"><span class="num"><pre>223</pre></span><pre>    def queryset_for_relation(self, relation_id):</pre></div>
+<div class="cov"><span class="num"><pre>224</pre></span><pre>        '''Returns a QuerySet of just the assertions having the</pre></div>
+<div class="cov"><span class="num"><pre>225</pre></span><pre>        specified relation.'''</pre></div>
+<div class="nocov"><span class="num"><pre>226</pre></span><pre>        return self.queryset().filter(relation__id=relation_id)</pre></div>
+<div class="skip"><span class="num"><pre>227</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>228</pre></span><pre>    def tensor_for_relation(self, relation_id):</pre></div>
+<div class="cov"><span class="num"><pre>229</pre></span><pre>        '''Returns a tensor built only from assertions of the given relation.'''</pre></div>
+<div class="nocov"><span class="num"><pre>230</pre></span><pre>        return self.queryset_to_tensor(self.queryset_for_relation(relation_id))</pre></div>
+<div class="skip"><span class="num"><pre>231</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>232</pre></span><pre>    def get_tensors_by_relation(self):</pre></div>
+<div class="cov"><span class="num"><pre>233</pre></span><pre>        '''Returns a dictionary mapping names of relations to tensors of that kind of data.'''</pre></div>
+<div class="nocov"><span class="num"><pre>234</pre></span><pre>        relation_name = get_relation_names()</pre></div>
+<div class="nocov"><span class="num"><pre>235</pre></span><pre>        by_rel = [(relation_name[rel_id], self.tensor_for_relation(rel_id))</pre></div>
+<div class="nocov"><span class="num"><pre>236</pre></span><pre>                  for rel_id in relation_name.keys()</pre></div>
+<div class="nocov"><span class="num"><pre>237</pre></span><pre>                  if relation_name[rel_id] != 'InheritsFrom']</pre></div>
+<div class="nocov"><span class="num"><pre>238</pre></span><pre>        return dict((name, tensor) for (name, tensor) in by_rel</pre></div>
+<div class="nocov"><span class="num"><pre>239</pre></span><pre>                    if len(tensor) &gt; 0)</pre></div>
+<div class="skip"><span class="num"><pre>240</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>241</pre></span><pre>    def identities_for_all_relations(self, byrel):</pre></div>
+<div class="cov"><span class="num"><pre>242</pre></span><pre>        '''Returns a tensor containing identity relations for the</pre></div>
+<div class="cov"><span class="num"><pre>243</pre></span><pre>        concepts in all tensors. We handle this separately so the</pre></div>
+<div class="cov"><span class="num"><pre>244</pre></span><pre>        blends don't include identities.'''</pre></div>
+<div class="skip"><span class="num"><pre>245</pre></span><pre>        # Build a tensor with all the concept labels.</pre></div>
+<div class="nocov"><span class="num"><pre>246</pre></span><pre>        tensor = self.tensor_class()</pre></div>
+<div class="nocov"><span class="num"><pre>247</pre></span><pre>        for other in byrel.itervalues():</pre></div>
+<div class="nocov"><span class="num"><pre>248</pre></span><pre>            tensor._labels[0].extend(other._labels[0])</pre></div>
+<div class="skip"><span class="num"><pre>249</pre></span><pre>        # Add identities to that as normal.</pre></div>
+<div class="nocov"><span class="num"><pre>250</pre></span><pre>        self.add_identities(tensor)</pre></div>
+<div class="nocov"><span class="num"><pre>251</pre></span><pre>        return tensor</pre></div>
+<div class="skip"><span class="num"><pre>252</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>253</pre></span><pre>    def __call__(self):</pre></div>
+<div class="nocov"><span class="num"><pre>254</pre></span><pre>        byrel = self.get_tensors_by_relation()</pre></div>
+<div class="nocov"><span class="num"><pre>255</pre></span><pre>        identity_tensor = self.identities_for_all_relations(byrel)</pre></div>
+<div class="nocov"><span class="num"><pre>256</pre></span><pre>        return Blend(byrel.values() + [identity_tensor])</pre></div>
+<div class="skip"><span class="num"><pre>257</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>258</pre></span><pre># A backwards-compatibility method.</pre></div>
+<div class="cov"><span class="num"><pre>259</pre></span><pre>def load_one_type(lang, relation, identities, cutoff):</pre></div>
+<div class="nocov"><span class="num"><pre>260</pre></span><pre>    return ByRelationBuilder(lang, identity_weight=identities, cutoff=cutoff).tensor_for_relation(relation)</pre></div>
+<div class="skip"><span class="num"><pre>261</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>262</pre></span><pre>def conceptnet_by_relations(lang, **kw):</pre></div>
+<div class="nocov"><span class="num"><pre>263</pre></span><pre>    return ByRelationBuilder(lang, **kw).get_tensors_by_relation()</pre></div>
+<div class="skip"><span class="num"><pre>264</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>265</pre></span><pre># Experiment: Flatten (just by weighted concepts)</pre></div>
+<div class="cov"><span class="num"><pre>266</pre></span><pre>class FlatConceptNetTensor(LabeledView):</pre></div>
+<div class="cov"><span class="num"><pre>267</pre></span><pre>    def __init__(self):</pre></div>
+<div class="nocov"><span class="num"><pre>268</pre></span><pre>        concepts = OrderedSet()</pre></div>
+<div class="nocov"><span class="num"><pre>269</pre></span><pre>        super(ConceptNet2DTensor, self).__init__(DictTensor(2), [concepts, concepts])</pre></div>
+<div class="skip"><span class="num"><pre>270</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>271</pre></span><pre>class FlatASpaceBuilder(MonolingualAnalogySpaceBuilder):</pre></div>
+<div class="cov"><span class="num"><pre>272</pre></span><pre>    def __init__(self, forward_weight_by_relation, forward_default_weight,</pre></div>
+<div class="cov"><span class="num"><pre>273</pre></span><pre>                 inverse_weight_by_relation, inverse_default_weight,</pre></div>
+<div class="cov"><span class="num"><pre>274</pre></span><pre>                 min_identity_weight=0.0, tensor_class=FlatConceptNetTensor, **kw):</pre></div>
+<div class="nocov"><span class="num"><pre>275</pre></span><pre>        super(FlatASpaceBuilder, self).__init__(tensor_class=tensor_class, **kw)</pre></div>
+<div class="nocov"><span class="num"><pre>276</pre></span><pre>        self.get_forward_weight = lambda relation: forward_weight_by_relation.get(relation, forward_default_weight)</pre></div>
+<div class="nocov"><span class="num"><pre>277</pre></span><pre>        self.get_inverse_weight = lambda relation: inverse_weight_by_relation.get(relation, inverse_default_weight)</pre></div>
+<div class="nocov"><span class="num"><pre>278</pre></span><pre>        self.min_identity_weight = min_identity_weight</pre></div>
+<div class="skip"><span class="num"><pre>279</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>280</pre></span><pre>    def queryset_to_tensor(self, queryset):</pre></div>
+<div class="nocov"><span class="num"><pre>281</pre></span><pre>        tensor = self.tensor_class()</pre></div>
+<div class="skip"><span class="num"><pre>282</pre></span><pre>        ## Micro-optimization:</pre></div>
+<div class="skip"><span class="num"><pre>283</pre></span><pre>        #tensor._labels[1] = tensor._labels[0]</pre></div>
+<div class="nocov"><span class="num"><pre>284</pre></span><pre>        get_forward_weight = self.get_forward_weight</pre></div>
+<div class="nocov"><span class="num"><pre>285</pre></span><pre>        get_inverse_weight = self.get_inverse_weight</pre></div>
+<div class="nocov"><span class="num"><pre>286</pre></span><pre>        get_value = self.get_value</pre></div>
+<div class="skip"><span class="num"><pre>287</pre></span><pre></pre></div>
+<div class="nocov"><span class="num"><pre>288</pre></span><pre>        for (relation, concept1, concept2, score, freq) in queryset.values_list(</pre></div>
+<div class="nocov"><span class="num"><pre>289</pre></span><pre>            'relation__name', 'concept1__text',  'concept2__text',  'score',</pre></div>
+<div class="nocov"><span class="num"><pre>290</pre></span><pre>            'frequency__value').iterator():</pre></div>
+<div class="skip"><span class="num"><pre>291</pre></span><pre></pre></div>
+<div class="nocov"><span class="num"><pre>292</pre></span><pre>            value = get_value(score, freq)</pre></div>
+<div class="skip"><span class="num"><pre>293</pre></span><pre>            # Add the forward link</pre></div>
+<div class="nocov"><span class="num"><pre>294</pre></span><pre>            fwd_val = get_forward_weight(relation)</pre></div>
+<div class="nocov"><span class="num"><pre>295</pre></span><pre>            if fwd_val: tensor[concept1, concept2] += fwd_val * value</pre></div>
+<div class="skip"><span class="num"><pre>296</pre></span><pre>            # Add the reverse link</pre></div>
+<div class="nocov"><span class="num"><pre>297</pre></span><pre>            rev_val = get_inverse_weight(relation)</pre></div>
+<div class="nocov"><span class="num"><pre>298</pre></span><pre>            if rev_val: tensor[concept2, concept1] += rev_val * value</pre></div>
+<div class="nocov"><span class="num"><pre>299</pre></span><pre>        return tensor</pre></div>
+<div class="skip"><span class="num"><pre>300</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>301</pre></span><pre>    def add_identities(self, tensor):</pre></div>
+<div class="nocov"><span class="num"><pre>302</pre></span><pre>        min_identity_weight = self.min_identity_weight</pre></div>
+<div class="nocov"><span class="num"><pre>303</pre></span><pre>        if min_identity_weight:</pre></div>
+<div class="skip"><span class="num"><pre>304</pre></span><pre>            # Ensure that the minimum weight of any concept with itself is min_identity_weight</pre></div>
+<div class="nocov"><span class="num"><pre>305</pre></span><pre>            for concept in tensor.label_list(0):</pre></div>
+<div class="nocov"><span class="num"><pre>306</pre></span><pre>                if tensor[concept, concept] &lt; min_identity_weight:</pre></div>
+<div class="nocov"><span class="num"><pre>307</pre></span><pre>                    tensor[concept, concept] = min_identity_weight</pre></div>
+<div class="skip"><span class="num"><pre>308</pre></span><pre>    </pre></div>
+<div class="skip"><span class="num"><pre>309</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>310</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>311</pre></span><pre># Compatibility API</pre></div>
+<div class="cov"><span class="num"><pre>312</pre></span><pre>def rename_elt(dct, old, new):</pre></div>
+<div class="cov"><span class="num"><pre>313</pre></span><pre>    if old in dct:</pre></div>
+<div class="nocov"><span class="num"><pre>314</pre></span><pre>        dct[new] = dct[old]</pre></div>
+<div class="nocov"><span class="num"><pre>315</pre></span><pre>        del dct[old]</pre></div>
+<div class="skip"><span class="num"><pre>316</pre></span><pre>        </pre></div>
+<div class="cov"><span class="num"><pre>317</pre></span><pre>def conceptnet_2d_from_db(lang, builder=MonolingualAnalogySpaceBuilder, **kw):</pre></div>
+<div class="cov"><span class="num"><pre>318</pre></span><pre>    '''Build a ConceptNet tensor in the given language.'''</pre></div>
+<div class="skip"><span class="num"><pre>319</pre></span><pre>    # Handle an old parameter</pre></div>
+<div class="cov"><span class="num"><pre>320</pre></span><pre>    rename_elt(kw, 'identities', 'identity_weight')</pre></div>
+<div class="cov"><span class="num"><pre>321</pre></span><pre>    return builder(lang=lang, **kw)().to_labeled_view()</pre></div>
+<div class="skip"><span class="num"><pre>322</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>323</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>324</pre></span><pre>def conceptnet_selfblend(lang, **kw):</pre></div>
+<div class="nocov"><span class="num"><pre>325</pre></span><pre>    return conceptnet_2d_from_db(lang, builder=ByRelationBuilder, **kw)</pre></div>
+<div class="skip"><span class="num"><pre>326</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>327</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>328</pre></span><pre>### Experiment: Add cooccurrences</pre></div>
+<div class="cov"><span class="num"><pre>329</pre></span><pre>class ConceptNetTensorWithCooccurrences(ConceptNet2DTensor):</pre></div>
+<div class="cov"><span class="num"><pre>330</pre></span><pre>    @classmethod</pre></div>
+<div class="cov"><span class="num"><pre>331</pre></span><pre>    def get_constructor(cls, cooccurrence_weight):</pre></div>
+<div class="nocov"><span class="num"><pre>332</pre></span><pre>        def constructor():</pre></div>
+<div class="nocov"><span class="num"><pre>333</pre></span><pre>            return cls(cooccurrence_weight)</pre></div>
+<div class="nocov"><span class="num"><pre>334</pre></span><pre>        return constructor</pre></div>
+<div class="skip"><span class="num"><pre>335</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>336</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>337</pre></span><pre>    def __init__(self, cooccurrence_weight, *a, **kw):</pre></div>
+<div class="nocov"><span class="num"><pre>338</pre></span><pre>        super(ConceptNet2DTensor, self).__init__(*a, **kw)</pre></div>
+<div class="nocov"><span class="num"><pre>339</pre></span><pre>        self.cooccurrence_weight = cooccurrence_weight</pre></div>
+<div class="skip"><span class="num"><pre>340</pre></span><pre>        </pre></div>
+<div class="cov"><span class="num"><pre>341</pre></span><pre>    def add_assertion(self, relation, left, right, value):</pre></div>
+<div class="skip"><span class="num"><pre>342</pre></span><pre>        # Add the normal assertion.</pre></div>
+<div class="nocov"><span class="num"><pre>343</pre></span><pre>        super_add_assertion = super(ConceptNetTensorWithCooccurrences, self)</pre></div>
+<div class="nocov"><span class="num"><pre>344</pre></span><pre>        super_add_assertion.add_assertion(relation, left, right, value)</pre></div>
+<div class="skip"><span class="num"><pre>345</pre></span><pre>    </pre></div>
+<div class="skip"><span class="num"><pre>346</pre></span><pre>        # Split apart right-side concepts.</pre></div>
+<div class="nocov"><span class="num"><pre>347</pre></span><pre>        rel = 'CooccursWith'</pre></div>
+<div class="nocov"><span class="num"><pre>348</pre></span><pre>        for right_side_word in right.split():</pre></div>
+<div class="nocov"><span class="num"><pre>349</pre></span><pre>            super_add_assertion(rel, left, right_side_word, value)</pre></div>
+<div class="skip"><span class="num"><pre>350</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>351</pre></span><pre>def conceptnet_2d_with_cooccurrences(lang, cooccurrence_weight=1.0, **kw):</pre></div>
+<div class="nocov"><span class="num"><pre>352</pre></span><pre>    kw['tensor_class'] = ConceptNetTensorWithCooccurrences.get_constructor(cooccurrence_weight)</pre></div>
+<div class="nocov"><span class="num"><pre>353</pre></span><pre>    return conceptnet_2d_from_db(lang, **kw)</pre></div>
+<div class="skip"><span class="num"><pre>354</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>355</pre></span><pre>###</pre></div>
+<div class="skip"><span class="num"><pre>356</pre></span><pre>### Analysis helpers</pre></div>
+<div class="skip"><span class="num"><pre>357</pre></span><pre>###</pre></div>
+<div class="skip"><span class="num"><pre>358</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>359</pre></span><pre>def concept_similarity(svd, concept):</pre></div>
+<div class="nocov"><span class="num"><pre>360</pre></span><pre>    return svd.u_dotproducts_with(svd.weighted_u_vec(concept))</pre></div>
+<div class="skip"><span class="num"><pre>361</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>362</pre></span><pre>def predict_features(svd, concept):</pre></div>
+<div class="nocov"><span class="num"><pre>363</pre></span><pre>    return svd.v_dotproducts_with(svd.weighted_u_vec(concept))</pre></div>
+<div class="skip"><span class="num"><pre>364</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>365</pre></span><pre>def feature_similarity(svd, feature):</pre></div>
+<div class="nocov"><span class="num"><pre>366</pre></span><pre>    return svd.v_dotproducts_with(svd.weighted_v_vec(feature))</pre></div>
+<div class="skip"><span class="num"><pre>367</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>368</pre></span><pre>def predict_concepts(svd, feature):</pre></div>
+<div class="nocov"><span class="num"><pre>369</pre></span><pre>    return svd.u_dotproducts_with(svd.weighted_v_vec(feature))</pre></div>
+<div class="skip"><span class="num"><pre>370</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>371</pre></span><pre>def make_category(svd, concepts=[], features=[]):</pre></div>
+<div class="nocov"><span class="num"><pre>372</pre></span><pre>    from operator import add</pre></div>
+<div class="nocov"><span class="num"><pre>373</pre></span><pre>    components = (</pre></div>
+<div class="nocov"><span class="num"><pre>374</pre></span><pre>        [svd.weighted_u_vec(concept) for concept in concepts] +</pre></div>
+<div class="nocov"><span class="num"><pre>375</pre></span><pre>        [svd.weighted_v_vec(feature) for feature in features])</pre></div>
+<div class="nocov"><span class="num"><pre>376</pre></span><pre>    return reduce(add, components)</pre></div>
+<div class="skip"><span class="num"><pre>377</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>378</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>379</pre></span><pre>def category_similarity(svd, cat):</pre></div>
+<div class="cov"><span class="num"><pre>380</pre></span><pre>    '''Return all the features and concepts that are close to the given</pre></div>
+<div class="cov"><span class="num"><pre>381</pre></span><pre>    category, as (concepts, features), both labeled dense tensors.</pre></div>
+<div class="skip"><span class="num"><pre>382</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>383</pre></span><pre>    Example usage:</pre></div>
+<div class="cov"><span class="num"><pre>384</pre></span><pre>    concepts, features = category_similarity(svd, cat)</pre></div>
+<div class="cov"><span class="num"><pre>385</pre></span><pre>    concepts.top_items(10)</pre></div>
+<div class="cov"><span class="num"><pre>386</pre></span><pre>    features.top_items(10)'''</pre></div>
+<div class="nocov"><span class="num"><pre>387</pre></span><pre>    return svd.u_dotproducts_with(cat), svd.v_dotproducts_with(cat)</pre></div>
+<div class="skip"><span class="num"><pre>388</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>389</pre></span><pre>def eval_assertion(svd, relation, left, right):</pre></div>
+<div class="nocov"><span class="num"><pre>390</pre></span><pre>    lfeature = ('left',relation,left)</pre></div>
+<div class="nocov"><span class="num"><pre>391</pre></span><pre>    rfeature = ('right',relation,right)</pre></div>
+<div class="skip"><span class="num"><pre>392</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>393</pre></span><pre>    # Evaluate right feature</pre></div>
+<div class="nocov"><span class="num"><pre>394</pre></span><pre>    try:</pre></div>
+<div class="nocov"><span class="num"><pre>395</pre></span><pre>        rfeature_val = svd.get_ahat((left, rfeature))</pre></div>
+<div class="nocov"><span class="num"><pre>396</pre></span><pre>    except KeyError:</pre></div>
+<div class="nocov"><span class="num"><pre>397</pre></span><pre>        rfeature_val = 0</pre></div>
+<div class="skip"><span class="num"><pre>398</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>399</pre></span><pre>    # Evaluate left feature</pre></div>
+<div class="nocov"><span class="num"><pre>400</pre></span><pre>    try:</pre></div>
+<div class="nocov"><span class="num"><pre>401</pre></span><pre>        lfeature_val = svd.get_ahat((right, lfeature))</pre></div>
+<div class="nocov"><span class="num"><pre>402</pre></span><pre>    except KeyError:</pre></div>
+<div class="nocov"><span class="num"><pre>403</pre></span><pre>        lfeature_val = 0</pre></div>
+<div class="skip"><span class="num"><pre>404</pre></span><pre></pre></div>
+<div class="nocov"><span class="num"><pre>405</pre></span><pre>    return lfeature_val, rfeature_val</pre></div>
+<div class="skip"><span class="num"><pre>406</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>407</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>408</pre></span><pre></pre></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<html>
+<head>
+<title>csc.nl.models</title>
+</head>
+<body>
+csc.nl.models
+<style>
+.coverage pre {float: left; margin: 0px 1em; border: none;
+               padding: 0px; }
+.num pre { margin: 0px }
+.nocov, .nocov pre {background-color: #faa}
+.cov, .cov pre {background-color: #cfc}
+div.coverage div { clear: both; height: 1.1em}
+</style>
+<div class="stats">
+Covered: 56 lines<br/>
+Missed: 15 lines<br/>
+Skipped 19 lines<br/>
+Percent: 78 %<br/>
+
+</div>
+<div class="coverage">
+<div class="cov"><span class="num"><pre> 1</pre></span><pre>from django.db import models</pre></div>
+<div class="cov"><span class="num"><pre> 2</pre></span><pre>from csc.corpus.models import Language</pre></div>
+<div class="skip"><span class="num"><pre> 3</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 4</pre></span><pre>class AutoreplaceRule(models.Model):</pre></div>
+<div class="cov"><span class="num"><pre> 5</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre> 6</pre></span><pre>    An AutoreplaceRule indicates that one word should be replaced by another.</pre></div>
+<div class="cov"><span class="num"><pre> 7</pre></span><pre>    These rules are used to correct misspellings when parsing ConceptNet.</pre></div>
+<div class="cov"><span class="num"><pre> 8</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre> 9</pre></span><pre>    language = models.ForeignKey(Language)</pre></div>
+<div class="cov"><span class="num"><pre>10</pre></span><pre>    family = models.CharField(blank=False,max_length=128)</pre></div>
+<div class="cov"><span class="num"><pre>11</pre></span><pre>    match = models.CharField(blank=False,max_length=128)</pre></div>
+<div class="cov"><span class="num"><pre>12</pre></span><pre>    replace_with = models.CharField(blank=True,max_length=128)</pre></div>
+<div class="cov"><span class="num"><pre>13</pre></span><pre>    unique_together = (('language', 'family', 'match'),)</pre></div>
+<div class="skip"><span class="num"><pre>14</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>15</pre></span><pre>    def __str__(self):</pre></div>
+<div class="nocov"><span class="num"><pre>16</pre></span><pre>        return &quot; (&quot; + str(self.language.id) + &quot;) &quot; + self.family + &quot; [&quot; + self.match + &quot; =&gt; &quot; + self.replace_with + &quot;]&quot;</pre></div>
+<div class="skip"><span class="num"><pre>17</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>18</pre></span><pre>    class Autoreplacer:</pre></div>
+<div class="cov"><span class="num"><pre>19</pre></span><pre>        def __init__(self,kb,language,family):</pre></div>
+<div class="nocov"><span class="num"><pre>20</pre></span><pre>            self.language = language</pre></div>
+<div class="nocov"><span class="num"><pre>21</pre></span><pre>            self.kb = kb</pre></div>
+<div class="nocov"><span class="num"><pre>22</pre></span><pre>            self.family = family</pre></div>
+<div class="skip"><span class="num"><pre>23</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>24</pre></span><pre>        def __str__(self):</pre></div>
+<div class="nocov"><span class="num"><pre>25</pre></span><pre>            return &quot;(&quot; + str(self.language.id) +&quot;) &quot; + self.family + &quot; autoreplace KB&quot;</pre></div>
+<div class="skip"><span class="num"><pre>26</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>27</pre></span><pre>        def __call__(self, text):</pre></div>
+<div class="nocov"><span class="num"><pre>28</pre></span><pre>            toks = text.split()</pre></div>
+<div class="nocov"><span class="num"><pre>29</pre></span><pre>            toks = [self.kb.get(x,x) for x in toks]</pre></div>
+<div class="nocov"><span class="num"><pre>30</pre></span><pre>            return ' '.join(toks)</pre></div>
+<div class="skip"><span class="num"><pre>31</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>32</pre></span><pre>    @staticmethod</pre></div>
+<div class="cov"><span class="num"><pre>33</pre></span><pre>    def build_autoreplacer(language,family):</pre></div>
+<div class="nocov"><span class="num"><pre>34</pre></span><pre>        kb = {}</pre></div>
+<div class="nocov"><span class="num"><pre>35</pre></span><pre>        for rule in language.autoreplacerule_set.filter(family=family):</pre></div>
+<div class="nocov"><span class="num"><pre>36</pre></span><pre>            kb[rule.match] = rule.replace_with</pre></div>
+<div class="nocov"><span class="num"><pre>37</pre></span><pre>        return AutoreplaceRule.Autoreplacer(kb,language,family)</pre></div>
+<div class="skip"><span class="num"><pre>38</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>39</pre></span><pre>    class Admin:</pre></div>
+<div class="cov"><span class="num"><pre>40</pre></span><pre>        pass</pre></div>
+<div class="skip"><span class="num"><pre>41</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>42</pre></span><pre>class FunctionClass(models.Model):</pre></div>
+<div class="cov"><span class="num"><pre>43</pre></span><pre>    &quot;&quot;&quot;A class of function words.&quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>44</pre></span><pre>    name = models.TextField(unique=True)</pre></div>
+<div class="skip"><span class="num"><pre>45</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>46</pre></span><pre>    def __unicode__(self):</pre></div>
+<div class="nocov"><span class="num"><pre>47</pre></span><pre>        return u&quot;&lt;FunctionClass: %s&gt;&quot; % self.name</pre></div>
+<div class="skip"><span class="num"><pre>48</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>49</pre></span><pre>    def function_word_set(self, language):</pre></div>
+<div class="cov"><span class="num"><pre>50</pre></span><pre>        &quot;Get a set of all the words in this class.&quot;</pre></div>
+<div class="cov"><span class="num"><pre>51</pre></span><pre>        words = self.words.filter(language=language).values_list('word', flat=True)</pre></div>
+<div class="cov"><span class="num"><pre>52</pre></span><pre>        return set(words)</pre></div>
+<div class="skip"><span class="num"><pre>53</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>54</pre></span><pre>class Frequency(models.Model):</pre></div>
+<div class="cov"><span class="num"><pre>55</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>56</pre></span><pre>    A Frequency is attached to an :class:`Assertion` to indicate how often</pre></div>
+<div class="cov"><span class="num"><pre>57</pre></span><pre>    it is the case. Each Frequency is attached to a natural-language modifier</pre></div>
+<div class="cov"><span class="num"><pre>58</pre></span><pre>    (generally an adverb), and has a value from -10 to 10.</pre></div>
+<div class="cov"><span class="num"><pre>59</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>60</pre></span><pre>    language = models.ForeignKey(Language)</pre></div>
+<div class="cov"><span class="num"><pre>61</pre></span><pre>    text = models.CharField(max_length=50, blank=True,</pre></div>
+<div class="cov"><span class="num"><pre>62</pre></span><pre>                            help_text='The frequency adverb used (e.g., &quot;always&quot;, &quot;sometimes&quot;, &quot;never&quot;). Empty means that the sentence has no frequency adverb.')</pre></div>
+<div class="skip"><span class="num"><pre>63</pre></span><pre>    # FIXME: is this help text still valid?</pre></div>
+<div class="cov"><span class="num"><pre>64</pre></span><pre>    value = models.IntegerField(help_text='A number between -10 and 10 indicating a rough numerical frequency to associate with this word. &quot;always&quot; would be 10, &quot;never&quot; would be -10, and not specifying a frequency adverb in English is specified to be 5.')</pre></div>
+<div class="skip"><span class="num"><pre>65</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>66</pre></span><pre>    def __unicode__(self):</pre></div>
+<div class="nocov"><span class="num"><pre>67</pre></span><pre>        return u'&lt;%s: &quot;%s&quot; (%d)&gt;' % (self.language.id, self.text, self.value)</pre></div>
+<div class="skip"><span class="num"><pre>68</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>69</pre></span><pre>    class Meta:</pre></div>
+<div class="cov"><span class="num"><pre>70</pre></span><pre>        unique_together = (('language', 'text'),)</pre></div>
+<div class="cov"><span class="num"><pre>71</pre></span><pre>        verbose_name = 'frequency adverb'</pre></div>
+<div class="cov"><span class="num"><pre>72</pre></span><pre>        verbose_name_plural = 'frequency adverbs'</pre></div>
+<div class="skip"><span class="num"><pre>73</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>74</pre></span><pre>class FunctionWord(models.Model):</pre></div>
+<div class="cov"><span class="num"><pre>75</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>76</pre></span><pre>    A FunctionWord is a word that should be handled specially by a parser or</pre></div>
+<div class="cov"><span class="num"><pre>77</pre></span><pre>    normalizer. FunctionWords can be grouped into different *classes*</pre></div>
+<div class="cov"><span class="num"><pre>78</pre></span><pre>    depending on how they should be handled.</pre></div>
+<div class="skip"><span class="num"><pre>79</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>80</pre></span><pre>    The most pertinent family of FunctionWord is *stop words*, words that</pre></div>
+<div class="cov"><span class="num"><pre>81</pre></span><pre>    should be ignored when normalizing a phrase of text.</pre></div>
+<div class="cov"><span class="num"><pre>82</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>83</pre></span><pre>    language = models.ForeignKey(Language)</pre></div>
+<div class="cov"><span class="num"><pre>84</pre></span><pre>    word = models.TextField()</pre></div>
+<div class="cov"><span class="num"><pre>85</pre></span><pre>    functionclass = models.ForeignKey(FunctionClass, null=False, related_name='words')</pre></div>
+<div class="skip"><span class="num"><pre>86</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>87</pre></span><pre>    def __unicode__(self):</pre></div>
+<div class="nocov"><span class="num"><pre>88</pre></span><pre>        return &quot;&lt;&quot; + self.language.id + &quot;:&quot; + self.word + &quot;&gt;&quot;</pre></div>
+<div class="skip"><span class="num"><pre>89</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>90</pre></span><pre></pre></div>
+</div>
+</body>
+</html>

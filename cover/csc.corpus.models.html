@@ -1,0 +1,223 @@
+<html>
+<head>
+<title>csc.corpus.models</title>
+</head>
+<body>
+csc.corpus.models
+<style>
+.coverage pre {float: left; margin: 0px 1em; border: none;
+               padding: 0px; }
+.num pre { margin: 0px }
+.nocov, .nocov pre {background-color: #faa}
+.cov, .cov pre {background-color: #cfc}
+div.coverage div { clear: both; height: 1.1em}
+</style>
+<div class="stats">
+Covered: 130 lines<br/>
+Missed: 36 lines<br/>
+Skipped 32 lines<br/>
+Percent: 78 %<br/>
+
+</div>
+<div class="coverage">
+<div class="cov"><span class="num"><pre>  1</pre></span><pre>__version__ = &quot;4.0b2&quot;</pre></div>
+<div class="cov"><span class="num"><pre>  2</pre></span><pre>__author__ = &quot;kcarnold@media.mit.edu, rspeer@media.mit.edu, jalonso@media.mit.edu, havasi@media.mit.edu, hugo@media.mit.edu&quot;</pre></div>
+<div class="cov"><span class="num"><pre>  3</pre></span><pre>__url__ = 'conceptnet.media.mit.edu'</pre></div>
+<div class="cov"><span class="num"><pre>  4</pre></span><pre>from django.db import models</pre></div>
+<div class="cov"><span class="num"><pre>  5</pre></span><pre>from django.contrib.auth.models import User</pre></div>
+<div class="cov"><span class="num"><pre>  6</pre></span><pre>from django.utils.functional import memoize</pre></div>
+<div class="cov"><span class="num"><pre>  7</pre></span><pre>from datetime import datetime</pre></div>
+<div class="cov"><span class="num"><pre>  8</pre></span><pre>from voting.models import Vote</pre></div>
+<div class="cov"><span class="num"><pre>  9</pre></span><pre>from events.models import Event, Activity</pre></div>
+<div class="cov"><span class="num"><pre> 10</pre></span><pre>from django.contrib.contenttypes import generic</pre></div>
+<div class="cov"><span class="num"><pre> 11</pre></span><pre>from django.contrib.contenttypes.models import ContentType</pre></div>
+<div class="cov"><span class="num"><pre> 12</pre></span><pre>from csc.nl import get_nl</pre></div>
+<div class="cov"><span class="num"><pre> 13</pre></span><pre>import re</pre></div>
+<div class="skip"><span class="num"><pre> 14</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 15</pre></span><pre>class ScoredModel(object):</pre></div>
+<div class="cov"><span class="num"><pre> 16</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre> 17</pre></span><pre>    A ScoredModel is one that users can vote on through a Django-based Web</pre></div>
+<div class="cov"><span class="num"><pre> 18</pre></span><pre>    site.</pre></div>
+<div class="skip"><span class="num"><pre> 19</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 20</pre></span><pre>    The score is cached in a column of the object's database table, and updated</pre></div>
+<div class="cov"><span class="num"><pre> 21</pre></span><pre>    whenever necessary.</pre></div>
+<div class="skip"><span class="num"><pre> 22</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 23</pre></span><pre>    This makes use of the `django-voting` library. However, if you alter votes</pre></div>
+<div class="cov"><span class="num"><pre> 24</pre></span><pre>    by using the `django-voting` library directly, the score will not be</pre></div>
+<div class="cov"><span class="num"><pre> 25</pre></span><pre>    updated correctly.</pre></div>
+<div class="cov"><span class="num"><pre> 26</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre> 27</pre></span><pre>    def get_rating(self, user):</pre></div>
+<div class="cov"><span class="num"><pre> 28</pre></span><pre>        &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre> 29</pre></span><pre>        Get the Vote object representing a certain user's vote on a certain</pre></div>
+<div class="cov"><span class="num"><pre> 30</pre></span><pre>        object. Returns None if the user has not voted on that object.</pre></div>
+<div class="cov"><span class="num"><pre> 31</pre></span><pre>        &quot;&quot;&quot;</pre></div>
+<div class="nocov"><span class="num"><pre> 32</pre></span><pre>        return getattr(Vote.objects.get_for_user(self, user), 'vote', None)</pre></div>
+<div class="skip"><span class="num"><pre> 33</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 34</pre></span><pre>    def set_rating(self, user, val, activity):</pre></div>
+<div class="cov"><span class="num"><pre> 35</pre></span><pre>        &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre> 36</pre></span><pre>        Set a user's Vote on a certain object. If the user has previously voted</pre></div>
+<div class="cov"><span class="num"><pre> 37</pre></span><pre>        on that object, it removes the old vote.</pre></div>
+<div class="cov"><span class="num"><pre> 38</pre></span><pre>        &quot;&quot;&quot;</pre></div>
+<div class="nocov"><span class="num"><pre> 39</pre></span><pre>        Vote.objects.record_vote(self, user, val)</pre></div>
+<div class="nocov"><span class="num"><pre> 40</pre></span><pre>        Event.record_event(self, user, activity)</pre></div>
+<div class="nocov"><span class="num"><pre> 41</pre></span><pre>        self.update_score()</pre></div>
+<div class="skip"><span class="num"><pre> 42</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 43</pre></span><pre>    def update_score(self):</pre></div>
+<div class="cov"><span class="num"><pre> 44</pre></span><pre>        &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre> 45</pre></span><pre>        Ensure that the `score` property of this object agrees with the sum of</pre></div>
+<div class="cov"><span class="num"><pre> 46</pre></span><pre>        the votes it has received.</pre></div>
+<div class="cov"><span class="num"><pre> 47</pre></span><pre>        &quot;&quot;&quot;</pre></div>
+<div class="nocov"><span class="num"><pre> 48</pre></span><pre>        self.score = Vote.objects.get_score(self)['score']</pre></div>
+<div class="nocov"><span class="num"><pre> 49</pre></span><pre>        self.save()</pre></div>
+<div class="skip"><span class="num"><pre> 50</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 51</pre></span><pre>cached_langs = {}</pre></div>
+<div class="cov"><span class="num"><pre> 52</pre></span><pre>def get_lang(lang_code):</pre></div>
+<div class="cov"><span class="num"><pre> 53</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre> 54</pre></span><pre>    Get a Language instance for a particular language, and remember it so that</pre></div>
+<div class="cov"><span class="num"><pre> 55</pre></span><pre>    it doesn't have to be looked up again.</pre></div>
+<div class="cov"><span class="num"><pre> 56</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre> 57</pre></span><pre>    return Language.objects.get(id=lang_code)</pre></div>
+<div class="cov"><span class="num"><pre> 58</pre></span><pre>get_lang = memoize(get_lang, cached_langs, 1)</pre></div>
+<div class="skip"><span class="num"><pre> 59</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 60</pre></span><pre>class Language(models.Model):</pre></div>
+<div class="cov"><span class="num"><pre> 61</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre> 62</pre></span><pre>    A database object representing a language.</pre></div>
+<div class="skip"><span class="num"><pre> 63</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 64</pre></span><pre>    Instances of Language can be used in filter expressions to select only</pre></div>
+<div class="cov"><span class="num"><pre> 65</pre></span><pre>    objects that apply to a particular language. For example:</pre></div>
+<div class="skip"><span class="num"><pre> 66</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre> 67</pre></span><pre>    &gt;&gt;&gt; en = Language.get('en')</pre></div>
+<div class="cov"><span class="num"><pre> 68</pre></span><pre>    &gt;&gt;&gt; english_sentences = Sentence.objects.filter(language=en)</pre></div>
+<div class="cov"><span class="num"><pre> 69</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre> 70</pre></span><pre>    id = models.CharField(max_length=16,primary_key=True)</pre></div>
+<div class="cov"><span class="num"><pre> 71</pre></span><pre>    name = models.TextField(blank=True)</pre></div>
+<div class="cov"><span class="num"><pre> 72</pre></span><pre>    sentence_count = models.IntegerField(default=0)</pre></div>
+<div class="skip"><span class="num"><pre> 73</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 74</pre></span><pre>    def __str__(self):</pre></div>
+<div class="nocov"><span class="num"><pre> 75</pre></span><pre>        return &quot;%s (%s)&quot; % (self.name, self.id)</pre></div>
+<div class="skip"><span class="num"><pre> 76</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 77</pre></span><pre>    @staticmethod</pre></div>
+<div class="cov"><span class="num"><pre> 78</pre></span><pre>    def get(id):</pre></div>
+<div class="cov"><span class="num"><pre> 79</pre></span><pre>        &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre> 80</pre></span><pre>        Get a language from its ISO language code.</pre></div>
+<div class="skip"><span class="num"><pre> 81</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 82</pre></span><pre>        Some relevant language codes::</pre></div>
+<div class="skip"><span class="num"><pre> 83</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 84</pre></span><pre>            en = English</pre></div>
+<div class="cov"><span class="num"><pre> 85</pre></span><pre>            pt = Portuguese</pre></div>
+<div class="cov"><span class="num"><pre> 86</pre></span><pre>            ko = Korean</pre></div>
+<div class="cov"><span class="num"><pre> 87</pre></span><pre>            ja = Japanese</pre></div>
+<div class="cov"><span class="num"><pre> 88</pre></span><pre>            nl = Dutch</pre></div>
+<div class="cov"><span class="num"><pre> 89</pre></span><pre>            es = Spanish</pre></div>
+<div class="cov"><span class="num"><pre> 90</pre></span><pre>            fr = French</pre></div>
+<div class="cov"><span class="num"><pre> 91</pre></span><pre>            ar = Arabic</pre></div>
+<div class="cov"><span class="num"><pre> 92</pre></span><pre>            zh = Chinese</pre></div>
+<div class="cov"><span class="num"><pre> 93</pre></span><pre>        &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre> 94</pre></span><pre>        if isinstance(id,Language): return id</pre></div>
+<div class="cov"><span class="num"><pre> 95</pre></span><pre>        return get_lang(id)</pre></div>
+<div class="skip"><span class="num"><pre> 96</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 97</pre></span><pre>    @property</pre></div>
+<div class="cov"><span class="num"><pre> 98</pre></span><pre>    def nl(self):</pre></div>
+<div class="cov"><span class="num"><pre> 99</pre></span><pre>        &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>100</pre></span><pre>        A collection of natural language tools for a language.</pre></div>
+<div class="skip"><span class="num"><pre>101</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>102</pre></span><pre>        See :mod:`csc.nl` for more information on using these tools.</pre></div>
+<div class="cov"><span class="num"><pre>103</pre></span><pre>        &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>104</pre></span><pre>        return get_nl(self.id)</pre></div>
+<div class="skip"><span class="num"><pre>105</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>106</pre></span><pre>class Sentence(models.Model, ScoredModel):</pre></div>
+<div class="cov"><span class="num"><pre>107</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>108</pre></span><pre>    A statement entered by a contributor, in unparsed natural language.</pre></div>
+<div class="cov"><span class="num"><pre>109</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>110</pre></span><pre>    text = models.TextField(blank=False)</pre></div>
+<div class="cov"><span class="num"><pre>111</pre></span><pre>    creator = models.ForeignKey(User)</pre></div>
+<div class="cov"><span class="num"><pre>112</pre></span><pre>    created_on = models.DateTimeField(default=datetime.now)</pre></div>
+<div class="cov"><span class="num"><pre>113</pre></span><pre>    language = models.ForeignKey(Language)</pre></div>
+<div class="cov"><span class="num"><pre>114</pre></span><pre>    activity = models.ForeignKey(Activity)</pre></div>
+<div class="cov"><span class="num"><pre>115</pre></span><pre>    score = models.IntegerField(default=0)</pre></div>
+<div class="cov"><span class="num"><pre>116</pre></span><pre>    votes = generic.GenericRelation(Vote)</pre></div>
+<div class="skip"><span class="num"><pre>117</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>118</pre></span><pre>    def __unicode__(self):</pre></div>
+<div class="nocov"><span class="num"><pre>119</pre></span><pre>        return  u'&lt;' + self.language.id + u': ' + \</pre></div>
+<div class="nocov"><span class="num"><pre>120</pre></span><pre>                u'&quot;' + self.text + u'&quot;' + \</pre></div>
+<div class="nocov"><span class="num"><pre>121</pre></span><pre>                u'(by:' + unicode(self.creator_id) + \</pre></div>
+<div class="nocov"><span class="num"><pre>122</pre></span><pre>                u' activity:' + self.activity.name + \</pre></div>
+<div class="nocov"><span class="num"><pre>123</pre></span><pre>                u')&gt;'</pre></div>
+<div class="skip"><span class="num"><pre>124</pre></span><pre>    </pre></div>
+<div class="skip"><span class="num"><pre>125</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>126</pre></span><pre>    def update_consistency(self):</pre></div>
+<div class="cov"><span class="num"><pre>127</pre></span><pre>        &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>128</pre></span><pre>        Assume that the creator of this sentence voted for it, and calculate</pre></div>
+<div class="cov"><span class="num"><pre>129</pre></span><pre>        the score.</pre></div>
+<div class="cov"><span class="num"><pre>130</pre></span><pre>        &quot;&quot;&quot;</pre></div>
+<div class="nocov"><span class="num"><pre>131</pre></span><pre>        try:</pre></div>
+<div class="nocov"><span class="num"><pre>132</pre></span><pre>            if self.creator is not None and self.get_rating(self.creator) is None:</pre></div>
+<div class="nocov"><span class="num"><pre>133</pre></span><pre>                if self.creator.username != 'verbosity':</pre></div>
+<div class="nocov"><span class="num"><pre>134</pre></span><pre>                    Vote.objects.record_vote(self, self.creator, 1)</pre></div>
+<div class="nocov"><span class="num"><pre>135</pre></span><pre>            self.update_score()</pre></div>
+<div class="nocov"><span class="num"><pre>136</pre></span><pre>        except User.DoesNotExist:</pre></div>
+<div class="nocov"><span class="num"><pre>137</pre></span><pre>            self.creator = User.objects.get(username='_ghost')</pre></div>
+<div class="nocov"><span class="num"><pre>138</pre></span><pre>            Vote.objects.record_vote(self, self.creator, 1)</pre></div>
+<div class="nocov"><span class="num"><pre>139</pre></span><pre>            self.update_score()</pre></div>
+<div class="skip"><span class="num"><pre>140</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>141</pre></span><pre>    class Meta:</pre></div>
+<div class="cov"><span class="num"><pre>142</pre></span><pre>        db_table = 'sentences'</pre></div>
+<div class="skip"><span class="num"><pre>143</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>144</pre></span><pre>class TaggedSentence(models.Model):</pre></div>
+<div class="cov"><span class="num"><pre>145</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>146</pre></span><pre>    The results of running a sentence through a tagger such as MXPOST.</pre></div>
+<div class="skip"><span class="num"><pre>147</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>148</pre></span><pre>    We could use this as a step in parsing ConceptNet, but we currently don't.</pre></div>
+<div class="cov"><span class="num"><pre>149</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>150</pre></span><pre>    text = models.TextField()</pre></div>
+<div class="cov"><span class="num"><pre>151</pre></span><pre>    language = models.ForeignKey(Language)</pre></div>
+<div class="cov"><span class="num"><pre>152</pre></span><pre>    sentence = models.ForeignKey(Sentence, primary_key=True)</pre></div>
+<div class="skip"><span class="num"><pre>153</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>154</pre></span><pre>    def tagged_words(self):</pre></div>
+<div class="nocov"><span class="num"><pre>155</pre></span><pre>        for part in self.text.split(&quot; &quot;):</pre></div>
+<div class="nocov"><span class="num"><pre>156</pre></span><pre>            word, tag = part.rsplit(&quot;/&quot;, 1)</pre></div>
+<div class="nocov"><span class="num"><pre>157</pre></span><pre>            yield word, tag</pre></div>
+<div class="skip"><span class="num"><pre>158</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>159</pre></span><pre>    def __unicode__(self):</pre></div>
+<div class="nocov"><span class="num"><pre>160</pre></span><pre>        return self.text</pre></div>
+<div class="skip"><span class="num"><pre>161</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>162</pre></span><pre>    class Meta:</pre></div>
+<div class="cov"><span class="num"><pre>163</pre></span><pre>        db_table = 'tagged_sentences'</pre></div>
+<div class="skip"><span class="num"><pre>164</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>165</pre></span><pre>class DependencyParse(models.Model):</pre></div>
+<div class="cov"><span class="num"><pre>166</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>167</pre></span><pre>    Each instance of DependencyParse is a single link in the Stanford</pre></div>
+<div class="cov"><span class="num"><pre>168</pre></span><pre>    dependency parse of a sentence.</pre></div>
+<div class="cov"><span class="num"><pre>169</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>170</pre></span><pre>    sentence = models.ForeignKey('Sentence')</pre></div>
+<div class="cov"><span class="num"><pre>171</pre></span><pre>    linktype = models.CharField(max_length=20)</pre></div>
+<div class="cov"><span class="num"><pre>172</pre></span><pre>    word1 = models.CharField(max_length=100)</pre></div>
+<div class="cov"><span class="num"><pre>173</pre></span><pre>    word2 = models.CharField(max_length=100)</pre></div>
+<div class="cov"><span class="num"><pre>174</pre></span><pre>    index1 = models.IntegerField()</pre></div>
+<div class="cov"><span class="num"><pre>175</pre></span><pre>    index2 = models.IntegerField()</pre></div>
+<div class="skip"><span class="num"><pre>176</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>177</pre></span><pre>    _PARSE_RE = re.compile(r&quot;(.+)\((.*)-(\d+)'*, (.*)-(\d+)'*\)&quot;)</pre></div>
+<div class="skip"><span class="num"><pre>178</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>179</pre></span><pre>    @staticmethod</pre></div>
+<div class="cov"><span class="num"><pre>180</pre></span><pre>    def from_string(sentence_id, depstring):</pre></div>
+<div class="nocov"><span class="num"><pre>181</pre></span><pre>        try:</pre></div>
+<div class="nocov"><span class="num"><pre>182</pre></span><pre>            link, w1, i1, w2, i2 = DependencyParse._PARSE_RE.match(depstring).groups()</pre></div>
+<div class="nocov"><span class="num"><pre>183</pre></span><pre>        except AttributeError:</pre></div>
+<div class="nocov"><span class="num"><pre>184</pre></span><pre>            raise ValueError(&quot;didn't match regex pattern: %s&quot; % depstring)</pre></div>
+<div class="nocov"><span class="num"><pre>185</pre></span><pre>        dep_obj = DependencyParse(sentence_id=sentence_id, linktype=link,</pre></div>
+<div class="nocov"><span class="num"><pre>186</pre></span><pre>                                  word1=w1, index1=int(i1),</pre></div>
+<div class="nocov"><span class="num"><pre>187</pre></span><pre>                                  word2=w2, index2=int(i2))</pre></div>
+<div class="nocov"><span class="num"><pre>188</pre></span><pre>        return dep_obj</pre></div>
+<div class="skip"><span class="num"><pre>189</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>190</pre></span><pre>    def __unicode__(self):</pre></div>
+<div class="nocov"><span class="num"><pre>191</pre></span><pre>        return u'%s(%s_%d, %s_%d) (sent %d)' % (</pre></div>
+<div class="nocov"><span class="num"><pre>192</pre></span><pre>            self.linktype, self.word1, self.index1, self.word2, self.index2,</pre></div>
+<div class="nocov"><span class="num"><pre>193</pre></span><pre>            self.sentence_id)</pre></div>
+<div class="skip"><span class="num"><pre>194</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>195</pre></span><pre>    class Meta:</pre></div>
+<div class="cov"><span class="num"><pre>196</pre></span><pre>        db_table = 'dependency_parses'</pre></div>
+<div class="skip"><span class="num"><pre>197</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>198</pre></span><pre></pre></div>
+</div>
+</body>
+</html>

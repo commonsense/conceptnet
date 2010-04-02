@@ -1,0 +1,15 @@
+try:
+        # You may create a db_password.py file in your project with a PASSWORD variable.
+        # This lets you keep sensitive information out of your source code repositories
+        # and your installation directories.
+	from db_password import PASSWORD
+except:
+	PASSWORD = ""
+	
+DB_ENGINE = "postgresql_psycopg2" # 'postgresql', 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'ado_mssql'.
+DB_NAME = "" # Or path to database file if using sqlite3.
+DB_HOST = "" # Not used with sqlite3.
+DB_PORT = "5432" # Not used with sqlite3.
+DB_USER = "" # Set to empty string for localhost. Not used with sqlite3.
+DB_PASSWORD = PASSWORD # Set to empty string for default. Not used with sqlite3.
+DB_SCHEMAS = "public"

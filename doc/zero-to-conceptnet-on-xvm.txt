@@ -1,0 +1,141 @@
+Zero to ConceptNet on XVM
+by Ken Arnold (kcarnold@mit.edu)
+
+These instructions tell you how to:
+* Use your MIT Athena account to conjure up a new Ubuntu virtual machine that you can use
+* Install ConceptNet and Divisi on that fresh Ubuntu machine
+
+If you don't have an MIT account, or you have your own Ubuntu Linux machine already, you can skip to the "Getting dependencies" section.
+
+Creating a new VM
+=================
+http://xvm.mit.edu/
+Log in
+Create VM: autoinstall Ubuntu Jaunty i386 (our stuff works on AMD64, but 64-bit pointers waste the precious little RAM you get
+go, wait 5 minutes, power on the new VM
+
+At a terminal with Kerberos tickets (e.g., Athena; ssh linux.mit.edu first)
+ssh MACHINE-NAME@xvm-console.mit.edu
+Hit Enter, type 'root'
+
+Making a user account to log in with ssh
+----------------------------------------
+
+Now add yourself as an admin user. But first we have to fix the configuration (this should not be necessary...):
+
+addgroup --gid 114 admin
+cat >> /etc/sudoers <<EOF
+# Members of the admin group may gain root privileges
+%admin ALL=(ALL) ALL
+EOF
+adduser kcarnold (info doesn't matter, only password)
+adduser kcarnold admin
+logout
+
+Yes, you need to run the 'adduser' command twice.
+
+Then you need to get out of here. To do that, hit Enter, then tilde, dot. (~.).
+
+Now you can reconnect to your VM with a normal ssh connection:
+
+ssh kcarnold.xvm.mit.edu
+
+Getting dependencies
+====================
+
+sudo aptitude update
+
+Now let's install some basic Python-y stuff:
+sudo aptitude install python-dev python-setuptools build-essential python-virtualenv python-numpy
+
+(If you're not installing Divisi, python-dev, build-essential, and python-numpy are unnecessary.)
+
+If you anticipate actually working on the ConceptNet code, some additional packages will be helpful:
+sudo aptitude install screen bzr
+
+Making a virtual environment
+============================
+
+virtualenv ~/py
+source py/bin/activate
+echo "source py/bin/activate" >> ~/.bashrc
+easy_install ipython
+
+Installing ConceptNet
+=====================
+
+All of this will get installed inside your virtual environment.
+
+easy_install django
+easy_install conceptnet
+wget http://conceptnet.media.mit.edu/dist/ConceptNet-sqlite.tar.gz
+tar -xvf ConceptNet-sqlite.tar.gz
+
+If you want to develop ConceptNet itself, replace `easy_install conceptnet` with:
+bzr branch lp:conceptnet
+cd conceptnet; ./setup.py develop; cd ..
+
+Try it out
+==========
+
+ipython
+from csc.conceptnet4.models import Concept
+dog = Concept.get('dog', 'en')
+for fwd in dog.get_assertions_forward()[:15]:
+    print fwd
+
+Documentation: http://conceptnet.media.mit.edu/doc/conceptnet/overview.html
+
+Installing Divisi
+=================
+
+easy_install divisi
+
+If you want to develop Divisi itself, do this instead:
+bzr branch lp:divisi
+cd divisi; ./setup.py develop; cd ..
+
+Try out Divisi
+==============
+
+You can make an AnalogySpace tensor like this:
+ipython
+from csc.conceptnet4.analogyspace import *
+tensor = conceptnet_2d_from_db(lang='en')
+ [or alternatively, follow directions at http://csc.media.mit.edu/pages/ubuntu-install/ to get it online]
+tensor['baseball', :].top_items()
+svd = tensor.svd(k=50)
+concept_similarity(svd, 'teach').top_items(10)
+
+
+Also, if you checked out the source, you can run our test suite:
+python divisi/test/tests.py
+
+Docuementation http://divisi.media.mit.edu/doc/intro.html
+
+Using our database server
+=========================
+sudo aptitude install python-psycopg2
+Then see: http://conceptnet.media.mit.edu/doc/conceptnet/install.html#optional-using-a-postgresql-database
+
+
+Some basic ConceptNet queries
+=============================
+
+http://conceptnet.media.mit.edu/doc/
+
+from csc.conceptnet4.models import *
+
+All assertions about "dog":
+>>> dog = Concept.get('dog','en')
+>>> Assertion.objects.filter(concept1=dog)
+(same as dog.get_assertions_forward() if you replace `objects` by `useful`)
+
+All sentences where "a dog" is the first item:
+>>> Sentence.objects.filter(rawassertion__text1__iexact='a dog')
+
+All assertions above some score
+>>> Assertion.objects.filter(language='en', score__gte=3).count()
+
+A useful reference: http://docs.djangoproject.com/en/dev/topics/db/queries/
+

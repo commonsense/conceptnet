@@ -1,0 +1,69 @@
+{% load rst %}
+.. _webapi:
+
+The ConceptNet Web API
+======================
+
+You can look up information in ConceptNet using a Web-based API. The API
+follows the `Representational State Transfer`_ (REST) standard, using simple
+HTTP requests to interact with the server. (A prominent example of a REST API
+is the `Twitter API`_.)
+
+.. _`Representational State Transfer`: http://en.wikipedia.org/wiki/Representational_State_Transfer
+.. _`Twitter API`: http://apiwiki.twitter.com/Twitter-API-Documentation
+
+The URLs listed below are relative to the base URL of {{API_BASE}}. As an
+example, you can use the command line utility cURL to see the results of the
+`/api/en/concept/duck` call::
+
+  curl {{API_BASE}}/api/en/concept/duck/
+
+By the way, the excellent `django-piston`_ library made it much easier to write
+this API, its documentation, and its examples, all at the same time.
+
+.. _`django-piston`: http://bitbucket.org/jespern/django-piston/wiki/Home
+
+If you want to quickly get started using this Web API in Python, go to the next
+section, `webapi-client`_.
+
+Output formats
+--------------
+
+When the API returns an object, it will represent it as a structure of key-value
+mappings. This structure will, by default, be represented in JSON format.
+
+You can request the results in a different format by adding "query.format" to
+the end of a URL:
+
+- Adding `query.xml` will request the results in XML format.
+- Adding `query.json` will request the results in their default JSON format.
+- Adding `query.yaml` will request the results in YAML_ format.
+  
+.. _YAML: http://yaml.org
+
+For example, adding "query.xml" will request the results in XML format.
+
+The examples shown below all use YAML format, because it is fairly readable and
+the most compact of all these formats.
+
+REST requests
+-------------
+
+{% for doc in docs %}
+.. function:: {{ doc.get_resource_uri_template }}
+
+    {{ doc.get_doc|default:""|safe }}
+    Implemented by: :class:`csc.webapi.{{ doc.name }}`
+
+    {% for method in doc.useful_methods %}
+    .. method:: {{ method.name }}({{ method.signature }})
+    
+        {{ method.get_doc|indent:"8"|safe }}
+    {% endfor %}
+    {% if doc.example_url %}
+    **Example:** `GET {{ doc.example_url }} <{{API_BASE}}{{ doc.example_url }}>`_ ::
+    
+        {{ doc.example_result|indent:"8"|safe }}
+    
+    {% endif %}
+{% endfor %}

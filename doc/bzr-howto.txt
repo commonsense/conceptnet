@@ -1,0 +1,93 @@
+Common Sense Computing and Bazaar
+=================================
+
+
+First-time setup
+----------------
+* Install Bazaar (bazaar-vcs.org)
+* Sign up for Launchpad (launchpad.net)
+* Join the Commonsense Computing team (http://launchpad.net/~commonsense)
+
+
+Working on a project
+--------------------
+
+Start by making a branch of the project you're working on:
+  bzr branch lp:conceptnet my_csamoa_branch
+(This gives you a local working directory called my_csamoa_branch.)
+
+Hack on the code.
+
+If you create new files, add them:
+  bzr add filename
+
+From time to time, commit:
+  bzr commit -m "this is my highly informative commit message"
+This commits to _your_ version-controlled repository. It can't mess with anyone else. It's safe.
+
+To incorporate new things that happen on the trunk, you need to _merge_:
+  bzr merge lp:conceptnet     # get your branch up to date with what's changed
+  bzr commit -m "Merged"
+
+If for some reason your working copy is out of date:
+  bzr update
+
+When it's ready for prime time, push it back into the trunk:
+  bzr push lp:conceptnet
+  
+If the trunk has changes you haven't merged, you'll need to merge before you can push.
+
+
+I don't want my own branch, I just want to use this like SVN
+------------------------------------------------------------
+
+Okay. This makes perfect sense for a quick change, but if you make a habit of this you're probably going to get in someone's way.
+
+Instead of branching, get a _checkout_:
+  bzr checkout lp:conceptnet
+
+A checkout is a working copy whose repository is somewhere else. When you commit, it commits to that repository. This is how everything worked in Subversion.
+
+To pull in new stuff from the repository:
+  bzr update
+  
+To commit your changes to the repository:
+  bzr commit -m "extremely informative message"
+  
+
+Checking out the same branch somewhere else
+-------------------------------------------
+You've made a branch on one computer, and you want to work with the same branch on another computer. No problem: make a checkout of it.
+  bzr checkout bzr+ssh://your.host.name/path/to/your/branch
+  
+Now you have multiple checkouts, and you can update, commit, etc. just like above.
+
+This also makes sense if you want to work on some minor branch that's on Launchpad (like ~commonsense/conceptnet/new-caledonia) without re-branching it. Check out that branch and commit to it.
+
+
+Sharing a branch
+----------------
+If you want someone else to be able to work with your branch, you probably want it hosted on Launchpad instead of your own computer. Here's how to do that:
+
+  bzr push lp:~username/project/branch-name
+  
+For example, Rob might do this:
+  bzr push lp:~rspeer/conceptnet/speed-up-the-lemmatizer
+  
+That's right, you can just make up a URL like that and suddenly Launchpad is hosting a branch for you. Now make your branch into a checkout of that new hosted branch:
+  bzr bind lp:~username/project/branch-name
+
+
+I screwed up! Shit shit shit.
+-----------------------------
+If you committed something you didn't mean to, you can fix it:
+  bzr uncommit
+
+If you added something you meant to be unversioned:
+  bzr remove --keep filename
+
+If you want to go back to a previous revision, look up how to use bzr merge -r.
+
+If you pushed to somewhere you didn't mean to, check out that branch and bzr merge -r it back to something sane.
+
+

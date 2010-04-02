@@ -1,0 +1,94 @@
+<html>
+<head>
+<title>csc.nl</title>
+</head>
+<body>
+csc.nl
+<style>
+.coverage pre {float: left; margin: 0px 1em; border: none;
+               padding: 0px; }
+.num pre { margin: 0px }
+.nocov, .nocov pre {background-color: #faa}
+.cov, .cov pre {background-color: #cfc}
+div.coverage div { clear: both; height: 1.1em}
+</style>
+<div class="stats">
+Covered: 50 lines<br/>
+Missed: 7 lines<br/>
+Skipped 12 lines<br/>
+Percent: 87 %<br/>
+
+</div>
+<div class="coverage">
+<div class="cov"><span class="num"><pre> 1</pre></span><pre>from django.utils.functional import memoize</pre></div>
+<div class="skip"><span class="num"><pre> 2</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 3</pre></span><pre>cached_nl = {}</pre></div>
+<div class="skip"><span class="num"><pre> 4</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre> 5</pre></span><pre>def get_nl(lang_code):</pre></div>
+<div class="cov"><span class="num"><pre> 6</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre> 7</pre></span><pre>    Get an object that handles natural language operations for a given</pre></div>
+<div class="cov"><span class="num"><pre> 8</pre></span><pre>    language, and remember it so that it doesn't have to be looked up again.</pre></div>
+<div class="cov"><span class="num"><pre> 9</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="skip"><span class="num"><pre>10</pre></span><pre>    # ignore variants when looking up the nl object</pre></div>
+<div class="cov"><span class="num"><pre>11</pre></span><pre>    lang_code = lang_code.split('-')[0]</pre></div>
+<div class="cov"><span class="num"><pre>12</pre></span><pre>    name = 'csc.nl.'+lang_code</pre></div>
+<div class="cov"><span class="num"><pre>13</pre></span><pre>    return __import__(name, [], [], 'NL').NL()</pre></div>
+<div class="cov"><span class="num"><pre>14</pre></span><pre>get_nl = memoize(get_nl, cached_nl, 1)</pre></div>
+<div class="skip"><span class="num"><pre>15</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>16</pre></span><pre>class NLTools(object):</pre></div>
+<div class="cov"><span class="num"><pre>17</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>18</pre></span><pre>    An NLTools object provides methods for dealing with natural language text</pre></div>
+<div class="cov"><span class="num"><pre>19</pre></span><pre>    in a particular language.</pre></div>
+<div class="skip"><span class="num"><pre>20</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>21</pre></span><pre>    So far, we have three classes of languages:</pre></div>
+<div class="skip"><span class="num"><pre>22</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>23</pre></span><pre>    * &quot;Lemmatized&quot; languages are languages where we have an MBLEM lemmatizer</pre></div>
+<div class="cov"><span class="num"><pre>24</pre></span><pre>      for removing or adding inflections to words. So far, this is just</pre></div>
+<div class="cov"><span class="num"><pre>25</pre></span><pre>      English, but it could easily include Dutch or German as well.</pre></div>
+<div class="cov"><span class="num"><pre>26</pre></span><pre>    * &quot;Stemmed&quot; languages are languages where we rely on a Snowball (Porter)</pre></div>
+<div class="cov"><span class="num"><pre>27</pre></span><pre>      stemmer to remove inflections from words. As there is a Snowball stemmer</pre></div>
+<div class="cov"><span class="num"><pre>28</pre></span><pre>      for most European languages, we treat most of them as stemmed languages.</pre></div>
+<div class="cov"><span class="num"><pre>29</pre></span><pre>    * &quot;Default&quot; languages are ones where we don't really know how to implement</pre></div>
+<div class="cov"><span class="num"><pre>30</pre></span><pre>      any NLP tools yet. All the methods perform trivial operations. Japanese,</pre></div>
+<div class="cov"><span class="num"><pre>31</pre></span><pre>      Korean, Chinese, and Arabic are currently &quot;default&quot; languages.</pre></div>
+<div class="skip"><span class="num"><pre>32</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>33</pre></span><pre>    With an NLTools object, you can perform these operations:</pre></div>
+<div class="skip"><span class="num"><pre>34</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>35</pre></span><pre>    * Detecting stopwords, or other words that we want to handle specially</pre></div>
+<div class="cov"><span class="num"><pre>36</pre></span><pre>    * Tokenizing a sentence by adding spaces and manipulating punctuation</pre></div>
+<div class="cov"><span class="num"><pre>37</pre></span><pre>    * Stemming/lemmatizing a phrase (which replaces inflected words with a</pre></div>
+<div class="cov"><span class="num"><pre>38</pre></span><pre>      single base form)</pre></div>
+<div class="cov"><span class="num"><pre>39</pre></span><pre>    * Synthesizing a phrase from a lemmatized form and a set of inflections</pre></div>
+<div class="skip"><span class="num"><pre>40</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>41</pre></span><pre>    The subclasses of NLTools define how these operations actually work.</pre></div>
+<div class="cov"><span class="num"><pre>42</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>43</pre></span><pre>    def __init__(self):</pre></div>
+<div class="nocov"><span class="num"><pre>44</pre></span><pre>        raise NotImplementedError, &quot;NLTools is an abstract class&quot;</pre></div>
+<div class="skip"><span class="num"><pre>45</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>46</pre></span><pre>class DefaultNL(NLTools):</pre></div>
+<div class="cov"><span class="num"><pre>47</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>48</pre></span><pre>    DefaultNL is a stub class for languages we don't know how to process. It</pre></div>
+<div class="cov"><span class="num"><pre>49</pre></span><pre>    implements all the NLTools methods in ways that do nothing in particular.</pre></div>
+<div class="cov"><span class="num"><pre>50</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>51</pre></span><pre>    def __init__(self): pass</pre></div>
+<div class="cov"><span class="num"><pre>52</pre></span><pre>    def is_stopword(self): return False</pre></div>
+<div class="cov"><span class="num"><pre>53</pre></span><pre>    def stem_word(self, stuff): return stuff</pre></div>
+<div class="cov"><span class="num"><pre>54</pre></span><pre>    def normalize(self, stuff): return stuff</pre></div>
+<div class="cov"><span class="num"><pre>55</pre></span><pre>    normalize4 = normalize</pre></div>
+<div class="cov"><span class="num"><pre>56</pre></span><pre>    def lemma_split(self, text, keep_stopwords=False):</pre></div>
+<div class="nocov"><span class="num"><pre>57</pre></span><pre>        return text, u'*'</pre></div>
+<div class="cov"><span class="num"><pre>58</pre></span><pre>    def word_split(self, word):</pre></div>
+<div class="nocov"><span class="num"><pre>59</pre></span><pre>        return (word, '')</pre></div>
+<div class="cov"><span class="num"><pre>60</pre></span><pre>    def is_blacklisted(self, text):</pre></div>
+<div class="nocov"><span class="num"><pre>61</pre></span><pre>        return False</pre></div>
+<div class="cov"><span class="num"><pre>62</pre></span><pre>    def lemma_factor(self, text):</pre></div>
+<div class="nocov"><span class="num"><pre>63</pre></span><pre>        return text, u'*'</pre></div>
+<div class="cov"><span class="num"><pre>64</pre></span><pre>    def lemma_combine(self, lemmas, residue):</pre></div>
+<div class="nocov"><span class="num"><pre>65</pre></span><pre>        return lemmas</pre></div>
+<div class="cov"><span class="num"><pre>66</pre></span><pre>    def tokenize(self, text):</pre></div>
+<div class="nocov"><span class="num"><pre>67</pre></span><pre>        return text</pre></div>
+<div class="skip"><span class="num"><pre>68</pre></span><pre></pre></div>
+<div class="skip"><span class="num"><pre>69</pre></span><pre></pre></div>
+</div>
+</body>
+</html>

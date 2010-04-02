@@ -1,0 +1,11 @@
+you => person
+i => person
+me => person
+he => person
+him => person
+she => person
+her => person
+they => person
+them => person
+someone => person
+somebody => person
