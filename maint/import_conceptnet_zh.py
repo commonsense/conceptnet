@@ -1,4 +1,4 @@
-from csc.conceptnet4.models import *
+from csc.conceptnet.models import *
 import codecs
 zh = Language.get('zh-Hant')
 activity = Activity.objects.get(name='Pet game')
@@ -8,7 +8,7 @@ def run(filename):
     for line in f:
         line = line.strip()
         if not line: continue
-        username, frame_id, text1, text2 = line.split(',')
+        username, frame_id, text1, text2 = line.split(', ')
         user, _ = User.objects.get_or_create(username=username,
             defaults=dict(
                 first_name='',
@@ -19,8 +19,12 @@ def run(filename):
         )
         frame = Frame.objects.get(id=int(frame_id))
         assert frame.language == zh
-        got = RawAssertion.make(user, frame, text1, text2, activity)
+        try:
+            got = RawAssertion.make(user, frame, text1, text2, activity)
+        except RawAssertion.MultipleObjectsReturned:
+            pass
         print got
     f.close()
 
-run('conceptnet_zh_part2.txt')
+for num in xrange(3,9):
+    run('conceptnet_zh_part%d.txt' % num)
