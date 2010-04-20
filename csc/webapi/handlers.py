@@ -465,3 +465,36 @@ class SentenceHandler(BaseHandler):
     allowed_methods = ()
     model = Sentence
     fields = ('text', 'creator', 'language', 'score', 'created_on')
+
+
+
+class RandomConceptHandler(BaseHandler):
+    """
+    A GET request to this URL returns the id of a random Concept
+
+    """
+    allowed_methods = ('GET',)
+    #model = RawAssertion.objects.filter(score__gt=2, language=lang
+    #fields = ('frame', 'surface1', 'surface2', 'creator', 'sentence',
+    #          'assertion', 'created', 'updated', 'language', 'score')
+
+    @throttle(60, 60, 'read')
+    def read(self, request, lang, scorethresh, num=20):
+        assertions = RawAssertion.objects.filter(score__gt=2, language=lang).select_related('surface1').order_by('?')
+
+        random_concepts = set([])
+
+        i = 0
+        while len(concepts) < num:
+            concept = assertions[i].surface1.text
+            random_concepts.add(concepts)
+            i += 1
+
+        #return something...
+
+
+    @staticmethod
+    def resource_uri():
+        return ('raw_assertion_handler', ['language_id', 'id', 'limit'])
+    example_args = {'lang': 'en', 'id': '26'}
+
