@@ -872,6 +872,9 @@ class RawAssertion(TimestampedModel, ScoredModel):
     score = models.IntegerField(default=0)
     votes = generic.GenericRelation(Vote)
 
+    class Meta:
+        unique_together = ('surface1', 'surface2', 'frame', 'language')
+    
     @property
     def relation(self): return self.frame.relation
     @property
