@@ -978,8 +978,7 @@ class RawAssertion(TimestampedModel, ScoredModel):
             surface1=surface1,
             surface2=surface2,
             language=lang,
-            creator=user,
-            defaults=dict(score=0)
+            defaults=dict(score=0, creator=user)
         )
         raw_assertion.save()
         
