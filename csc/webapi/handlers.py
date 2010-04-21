@@ -479,22 +479,27 @@ class RandomConceptHandler(BaseHandler):
     #          'assertion', 'created', 'updated', 'language', 'score')
 
     @throttle(60, 60, 'read')
-    def read(self, request, lang, scorethresh, num=20):
-        assertions = RawAssertion.objects.filter(score__gt=2, language=lang).select_related('surface1').order_by('?')
+    def read(self, request, lang, scorethresh=2, num=2):
+        print "Getting random concepts"
+        assertions = RawAssertion.objects.filter(score__gt=scorethresh, language=lang).select_related('surface1').order_by('?')
+        print "Done got random"
 
         random_concepts = set([])
 
         i = 0
-        while len(concepts) < num:
+        while len(random_concepts) < num:
+            print "In loop"
             concept = assertions[i].surface1.text
+            print "also in loop"
             random_concepts.add(concepts)
             i += 1
 
-        #return something...
+        print "Done getting concepts"
+        return random_concepts
 
 
     @staticmethod
     def resource_uri():
-        return ('raw_assertion_handler', ['language_id', 'id', 'limit'])
-    example_args = {'lang': 'en', 'id': '26'}
+        return ('random_concept_handler', ['language_id', 'threshold', 'limit'])
+    example_args = {'lang': 'en', 'thresh': '2', 'limit': '2'}
 

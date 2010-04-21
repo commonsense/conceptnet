@@ -42,6 +42,8 @@ urlpatterns = patterns('',
         Resource(RawAssertionHandler), name='raw_assertion_handler'),
     url(r'^(?P<lang>.+)/frequency/(?P<text>[^/]*)/'+Q,
         Resource(FrequencyHandler), name='frequency_handler'),
+    url(r'^(?P<lang>.+)/random/'+Q,
+        Resource(RandomConceptHandler), name='random_concept_handler'),
     url(r'docs.txt$',
         documentation_view, name='documentation_view')
 )
