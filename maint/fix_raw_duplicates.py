@@ -1,5 +1,5 @@
 from csc.util import queryset_foreach
-from conceptnet4.models import Sentence, Assertion, RawAssertion, Vote
+from csc.conceptnet4.models import Sentence, Assertion, RawAssertion, Vote
 
 def check_for_dupes(r):
     for other in RawAssertion.objects.filter(surface1=r.surface1,
