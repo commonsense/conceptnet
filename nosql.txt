@@ -1,0 +1,38 @@
+Ideas for representing ConceptNet without SQL
+=============================================
+
+Document types
+--------------
+
+Edge:
+
+- type: 'statement', 'assertion', 'semantic', 'dependency', 'feature'...
+- dataset: language
+- text: (best sentence)
+- justifications: an AND/OR tree of reasons to believe it
+- nodes: (list; hopefully at least 2)
+- label: the label on the edge
+- frequency: how often it's true
+- confidence: generated from justifications
+- weight: generated from frequency and confidence
+- valid: T/F
+- history: (list of [timestamp, description])
+
+Node:
+
+- type: 'node'
+- id: (normalized name)
+- text: (best un-normalized name)
+- dataset: language
+- edges: (list)
+- valid: T/F
+
+FreeText:
+
+- type: 'sentence'
+- dataset
+- tokens: (list)
+- valid: T/F
+- confidence
+- justifications
+
