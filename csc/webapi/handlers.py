@@ -302,6 +302,25 @@ class AssertionHandler(BaseHandler):
         return ('assertion_handler', ['language_id', 'id'])
     example_args = {'lang': 'en', 'id': '25'}
 
+class AssertionFindHandler(BaseHandler):
+    """
+    A GET request to this URL will return an Assertion
+    given the text of its two concepts and its relation.
+
+    - `relation` is the name of the relation.
+    - `text1` is the text of the first concept.
+    - `text2` is the text of the second concept.
+    
+    The concept text can actually be any surface form that normalizes to that
+    concept.
+
+    If such an assertion exists, it will be returned. If not, you will get a
+    404 response. You can use this to find out whether the assertion exists or
+    not.
+    """
+    # TODO: implement
+    pass
+
 class RatedObjectHandler(BaseHandler):
     """
     A GET request to this URL will look up an object that can be voted on

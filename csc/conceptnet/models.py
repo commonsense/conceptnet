@@ -976,16 +976,26 @@ class RawAssertion(TimestampedModel, ScoredModel):
         surface1 = SurfaceForm.get(text1, lang, auto_create=True)
         surface2 = SurfaceForm.get(text2, lang, auto_create=True)
         
-        raw_assertion, _ = RawAssertion.objects.get_or_create(
+        existing = RawAssertion.objects.filter(
+            frame=frame,
+            surface1=surface1,
+            surface2=surface2,
+            language=lang
+        )
+        if len(existing) > 0:
+            # return early if this RawAssertion already exists
+            return existing[0]
+
+        raw_assertion = RawAssertion.objects.create(
             frame=frame,
             surface1=surface1,
             surface2=surface2,
             language=lang,
-            defaults=dict(score=0, creator=user)
+            score=0,
+            creator=user
         )
-        raw_assertion.save()
         
-        assertion, _ = Assertion.objects.get_or_create(
+        assertion, c = Assertion.objects.get_or_create(
             relation=frame.relation,
             concept1=surface1.concept,
             concept2=surface2.concept,
@@ -993,7 +1003,7 @@ class RawAssertion(TimestampedModel, ScoredModel):
             language=lang,
             defaults=dict(score=0)
         )
-        assertion.save()
+        if c: assertion.save()
         raw_assertion.assertion = assertion
         
         sentence, c = Sentence.objects.get_or_create(
@@ -1007,7 +1017,7 @@ class RawAssertion(TimestampedModel, ScoredModel):
             lang.sentence_count += 1
             lang.save()
             sentence.save()
-                
+        
         Event.record_event(sentence, user, activity)
         sentence.set_rating(user, vote, activity)
         raw_assertion.set_rating(user, vote, activity)
