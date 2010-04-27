@@ -477,7 +477,7 @@ class RandomConceptHandler(BaseHandler):
     #model = RawAssertion.objects.filter(score__gt=2, language=lang
     #fields = ('frame', 'surface1', 'surface2', 'creator', 'sentence',
     #          'assertion', 'created', 'updated', 'language', 'score')
-
+l
     @throttle(60, 60, 'read')
     def read(self, request, lang, scorethresh=2, num=2):
         print "Getting random concepts"
