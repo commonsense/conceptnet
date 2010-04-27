@@ -477,9 +477,9 @@ class RandomConceptHandler(BaseHandler):
     #model = RawAssertion.objects.filter(score__gt=2, language=lang
     #fields = ('frame', 'surface1', 'surface2', 'creator', 'sentence',
     #          'assertion', 'created', 'updated', 'language', 'score')
-l
+
     @throttle(60, 60, 'read')
-    def read(self, request, lang, scorethresh=2, num=2):
+    def read(self, request, lang, scorethresh=5, num=2):
         print "Getting random concepts"
         assertions = RawAssertion.objects.filter(score__gt=scorethresh, language=lang).select_related('surface1').order_by('?')
         print "Done got random"
@@ -489,9 +489,10 @@ l
         i = 0
         while len(random_concepts) < num:
             print "In loop"
+            print assertions[i]
             concept = assertions[i].surface1.text
             print "also in loop"
-            random_concepts.add(concepts)
+            random_concepts.add(concept)
             i += 1
 
         print "Done getting concepts"
