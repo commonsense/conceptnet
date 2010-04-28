@@ -56,7 +56,7 @@ class ConceptHandler(BaseHandler):
     model = Concept
     fields = ('text', 'language', 'canonical_name')
     
-    @throttle(60, 60, 'read')
+    @throttle(600, 60, 'read')
     def read(self, request, lang, concept):        
         try:
             return concept_lookup(concept, lang)
@@ -80,7 +80,7 @@ class ConceptAssertionHandler(BaseHandler):
     """
     allowed_methods = ('GET',)
 
-    @throttle(20, 60, 'search')
+    @throttle(200, 60, 'search')
     def read(self, request, lang, concept, limit=20):
         limit = int(limit)
         if limit > 100: limit = 100
@@ -107,7 +107,7 @@ class ConceptSurfaceHandler(BaseHandler):
     """
     allowed_methods = ('GET',)
 
-    @throttle(20, 60, 'search')
+    @throttle(200, 60, 'search')
     def read(self, request, lang, concept, limit=20):
         limit = int(limit)
         if limit > 100: limit = 100
@@ -143,7 +143,7 @@ class ConceptFeatureHandler(BaseHandler):
     concept will be omitted from each feature, because you already know it.
     """
 
-    @throttle(60, 60, 'read')
+    @throttle(600, 60, 'read')
     def read(self, request, lang, concept):
         try:
             concept = concept_lookup(concept, lang)
@@ -180,7 +180,7 @@ class FeatureQueryHandler(BaseHandler):
     """
     allowed_methods = ('GET',)
 
-    @throttle(60, 60, 'read')
+    @throttle(600, 60, 'read')
     def read(self, request, lang, dir, relation, concept, limit=20):
         limit = int(limit)
         if limit > 100: limit=20
@@ -217,7 +217,7 @@ class FrequencyHandler(BaseHandler):
     model = Frequency
     fields = ('text', 'value', 'language')
     
-    @throttle(60, 60, 'read')
+    @throttle(600, 60, 'read')
     def read(self, request, lang, text):
         try:
             return Frequency.objects.get(text=text, language__id=lang)
@@ -239,7 +239,7 @@ class SurfaceFormHandler(BaseHandler):
     model = SurfaceForm
     fields = ('text', 'concept', 'residue', 'language')
     
-    @throttle(60, 60, 'read')
+    @throttle(600, 60, 'read')
     def read(self, request, lang, text):
         try:
             return SurfaceForm.get(text, lang)
@@ -262,7 +262,7 @@ class FrameHandler(BaseHandler):
     model = Frame
     fields = ('text', 'relation', 'frequency', 'goodness', 'language')
     
-    @throttle(60, 60, 'read')
+    @throttle(600, 60, 'read')
     def read(self, request, lang, id):
         try:
             return Frame.objects.get(id=id, language__id=lang)
@@ -287,7 +287,7 @@ class AssertionHandler(BaseHandler):
     fields = ('relation', 'concept1', 'concept2', 'frequency', 'score',
     'language')
     
-    @throttle(60, 60, 'read')
+    @throttle(600, 60, 'read')
     def read(self, request, lang, id):
         try:
             a = Assertion.objects.get(
@@ -301,6 +301,25 @@ class AssertionHandler(BaseHandler):
     def resource_uri():
         return ('assertion_handler', ['language_id', 'id'])
     example_args = {'lang': 'en', 'id': '25'}
+
+class AssertionFindHandler(BaseHandler):
+    """
+    A GET request to this URL will return an Assertion
+    given the text of its two concepts and its relation.
+
+    - `relation` is the name of the relation.
+    - `text1` is the text of the first concept.
+    - `text2` is the text of the second concept.
+    
+    The concept text can actually be any surface form that normalizes to that
+    concept.
+
+    If such an assertion exists, it will be returned. If not, you will get a
+    404 response. You can use this to find out whether the assertion exists or
+    not.
+    """
+    # TODO: implement
+    pass
 
 class RatedObjectHandler(BaseHandler):
     """
@@ -331,7 +350,7 @@ class RatedObjectHandler(BaseHandler):
         'sentence': Sentence
     }
     
-    @throttle(60, 60, 'read')
+    @throttle(600, 60, 'read')
     def read(self, request, type, lang, id):
         try:
             theclass = RatedObjectHandler.classes[type]
@@ -347,7 +366,7 @@ class RatedObjectHandler(BaseHandler):
         except theclass.DoesNotExist:
             return rc.NOT_FOUND
 
-    @throttle(60, 60, 'vote')
+    @throttle(600, 60, 'vote')
     def create(self, request, type, lang, id):
         check_authentication(request)
         try:
@@ -397,7 +416,7 @@ class RawAssertionHandler(BaseHandler):
     fields = ('frame', 'surface1', 'surface2', 'creator', 'sentence',
               'assertion', 'created', 'updated', 'language', 'score')
 
-    @throttle(60, 60, 'read')
+    @throttle(600, 60, 'read')
     def read(self, request, lang, id):
         try:
             r = RawAssertion.objects.get(
@@ -432,7 +451,7 @@ class RawAssertionByFrameHandler(BaseHandler):
       you create it, something you often want to do.
     """
     allowed_methods = ('GET', 'POST')
-    @throttle(20, 60, 'search')
+    @throttle(200, 60, 'search')
     def read(self, request, lang, id, limit=20):
         limit = int(limit)
         if limit > 100: limit = 100
@@ -441,7 +460,7 @@ class RawAssertionByFrameHandler(BaseHandler):
         except Frame.DoesNotExist:
             return rc.NOT_FOUND
 
-    @throttle(5, 60, 'add')
+    @throttle(200, 60, 'add')
     def create(self, request, lang, id, limit=None):
         check_authentication(request)
         try:

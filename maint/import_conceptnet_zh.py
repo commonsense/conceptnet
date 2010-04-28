@@ -19,10 +19,7 @@ def run(filename):
         )
         frame = Frame.objects.get(id=int(frame_id))
         assert frame.language == zh
-        try:
-            got = RawAssertion.make(user, frame, text1, text2, activity)
-        except RawAssertion.MultipleObjectsReturned:
-            pass
+        got = RawAssertion.make(user, frame, text1, text2, activity)
         print got
     f.close()
 
