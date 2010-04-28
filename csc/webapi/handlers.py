@@ -468,6 +468,9 @@ class SentenceHandler(BaseHandler):
 
 
 
+
+#Change to be random/concept
+
 class RandomConceptHandler(BaseHandler):
     """
     A GET request to this URL returns the id of a random Concept
@@ -479,22 +482,32 @@ class RandomConceptHandler(BaseHandler):
     #          'assertion', 'created', 'updated', 'language', 'score')
 
     @throttle(60, 60, 'read')
-    def read(self, request, lang, scorethresh, num=20):
-        assertions = RawAssertion.objects.filter(score__gt=2, language=lang).select_related('surface1').order_by('?')
+    def read(self, request, lang, score_thresh=2, num=2):
+        print "I'm in random"
+        assertions = RawAssertion.objects.filter(score__gt=score_thresh, language=lang).select_related('surface1').order_by('?')
 
-        random_concepts = set([])
+        random_concepts = {}
 
         i = 0
-        while len(concepts) < num:
-            concept = assertions[i].surface1.text
-            random_concepts.add(concepts)
+        while len(random_concepts) < num and i < len(assertions):
+            #Gets the first concept from the assertion
+            concept = assertions[i].surface1
+
+            #Adds it to the set, to make sure we're not adding duplicates
+            random_concepts.add(concept)
             i += 1
 
-        #return something...
+        random_concepts_dict = {}
+        for c in random_concepts:
+            random
 
+        return random_concepts
+                #{'type': type,
+                #    type: theobj,
+                #    'votes': theobj.votes.all()}
 
     @staticmethod
     def resource_uri():
-        return ('raw_assertion_handler', ['language_id', 'id', 'limit'])
-    example_args = {'lang': 'en', 'id': '26'}
+        return ('random_concept_handler', ['language_id', 'score_thresh', 'number'])
+    #example_args = {'lang': 'en', 'id': '26'}
 
