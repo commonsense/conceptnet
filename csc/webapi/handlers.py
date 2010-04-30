@@ -505,9 +505,11 @@ class RandomConceptHandler(BaseHandler):
         print "I'm in random"
         assertions = RawAssertion.objects.filter(score__gt=score_thresh, language=lang).select_related('surface1').order_by('?')
 
+
         random_concepts = {}
 
         i = 0
+
         while len(random_concepts) < num and i < len(assertions):
             #Gets the first concept from the assertion
             concept = assertions[i].surface1
@@ -516,9 +518,9 @@ class RandomConceptHandler(BaseHandler):
             random_concepts.add(concept)
             i += 1
 
-        random_concepts_dict = {}
-        for c in random_concepts:
-            random
+       # random_concepts_dict = {}
+       # for c in random_concepts:
+       #     random
 
         return random_concepts
                 #{'type': type,
@@ -527,6 +529,7 @@ class RandomConceptHandler(BaseHandler):
 
     @staticmethod
     def resource_uri():
-        return ('random_concept_handler', ['language_id', 'score_thresh', 'number'])
-    #example_args = {'lang': 'en', 'id': '26'}
+        return ('random_concept_handler', ['language_id', 'threshold', 'limit'])
+    example_args = {'lang': 'en', 'thresh': '2', 'limit': '2'}
+
 
