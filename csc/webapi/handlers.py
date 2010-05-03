@@ -511,42 +511,45 @@ class SentenceHandler(BaseHandler):
 
 
 
-#Change to be random/concept
-
 class RandomConceptHandler(BaseHandler):
     """
-    A GET request to this URL returns the id of a random Concept
+    A GET request to this URL returns the surface form and text of NUM randoms concept
+
+    Setting the threshold value will only return concepts contained in assertions
+    scoring higher than the thresh value
 
     """
     allowed_methods = ('GET',)
-    #model = RawAssertion.objects.filter(score__gt=2, language=lang
-    #fields = ('frame', 'surface1', 'surface2', 'creator', 'sentence',
-    #          'assertion', 'created', 'updated', 'language', 'score')
 
     @throttle(60, 60, 'read')
-    def read(self, request, lang, score_thresh=2, num=2):
+
+    def read(self, request, lang, limit=2, thresh=2):
         #TODO
         pass
-       ##  assertions = RawAssertion.objects.filter(score__gt=score_thresh, language=lang).select_related('surface1').order_by('?')
-       ##  random_concepts = {}
-       ##  i = 0
-       ##  while len(random_concepts) < num and i < len(assertions):
-       ##      #Gets the first concept from the assertion
-       ##      concept = assertions[i].surface1
-       ##      #Adds it to the set, to make sure we're not adding duplicates
-       ##      random_concepts.add(concept)
-       ##      i += 1
-       ## # random_concepts_dict = {}
-       ## # for c in random_concepts:
-       ## #     random
-       ##  return random_concepts
-       ##          #{'type': type,
-       ##          #    type: theobj,
-       ##          #    'votes': theobj.votes.all()}
 
+        ## limit = int(limit)
+        ## thresh = int(thresh)
+        ## assertions = RawAssertion.objects.filter(score__gt=thresh, language=lang).select_related('surface1').order_by('?')
+
+       
+        ## random_concepts = {}
+
+
+        ## for a in assertions:
+        ##     if len(random_concepts) >= limit:
+        ##         print "Bigger"
+        ##         break
+            
+        ##     concept = a.surface1.concept
+        ##     if concept not in random_concepts:
+        ##         random_concepts[concept] = {'surface': str(a.surface1), 'text': str(concept.text) }
+
+
+        ## return random_concepts.values()
+    
     @staticmethod
     def resource_uri():
-        return ('random_concept_handler', ['language_id', 'threshold', 'limit'])
-    example_args = {'lang': 'en', 'thresh': '2', 'limit': '2'}
+        return ('random_concept_handler', ['language_id', 'limit', 'thresh'])
+    example_args = {'lang': 'en', 'limit': '2', 'thresh': '2'}
 
 

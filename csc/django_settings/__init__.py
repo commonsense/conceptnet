@@ -57,7 +57,7 @@ def relative_to_db_config(path):
 # This sets the Python path to include the distributed libraries.
 import csc.lib
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = ()
