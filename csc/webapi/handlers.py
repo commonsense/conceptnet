@@ -318,9 +318,32 @@ class AssertionFindHandler(BaseHandler):
     404 response. You can use this to find out whether the assertion exists or
     not.
     """
-    # TODO: implement
-    pass
 
+    allowed_methods = ('GET',)
+
+    @throttle(200, 60, 'search')
+    def read(self, request, lang, relation, text1, text2):
+        try:
+            concept1 = concept_lookup(text1, lang)
+            concept2 = concept_lookup(text2, lang)
+            relation = Relation.objects.get(name=relation)
+        except Concept.DoesNotExist:
+            return rc.NOT_FOUND
+        except Relation.DoesNotExist:
+            return rc.NOT_FOUND
+
+        assertion = Assertion.objects.filter(concept1=concept1, concept2=concept2, relation=relation).order_by('relation').distinct()
+
+        return assertion
+
+
+        
+    @staticmethod
+    def resource_uri():
+        return ('assertion_find_handler', ['language_id', 'relation', 'text1', 'text2'])
+    example_args = {'lang': 'en', 'relation': 'IsA', 'text1': 'dog', 'text2': 'animal'}
+
+        
 class RatedObjectHandler(BaseHandler):
     """
     A GET request to this URL will look up an object that can be voted on
@@ -502,30 +525,24 @@ class RandomConceptHandler(BaseHandler):
 
     @throttle(60, 60, 'read')
     def read(self, request, lang, score_thresh=2, num=2):
-        print "I'm in random"
-        assertions = RawAssertion.objects.filter(score__gt=score_thresh, language=lang).select_related('surface1').order_by('?')
-
-
-        random_concepts = {}
-
-        i = 0
-
-        while len(random_concepts) < num and i < len(assertions):
-            #Gets the first concept from the assertion
-            concept = assertions[i].surface1
-
-            #Adds it to the set, to make sure we're not adding duplicates
-            random_concepts.add(concept)
-            i += 1
-
-       # random_concepts_dict = {}
-       # for c in random_concepts:
-       #     random
-
-        return random_concepts
-                #{'type': type,
-                #    type: theobj,
-                #    'votes': theobj.votes.all()}
+        #TODO
+        pass
+       ##  assertions = RawAssertion.objects.filter(score__gt=score_thresh, language=lang).select_related('surface1').order_by('?')
+       ##  random_concepts = {}
+       ##  i = 0
+       ##  while len(random_concepts) < num and i < len(assertions):
+       ##      #Gets the first concept from the assertion
+       ##      concept = assertions[i].surface1
+       ##      #Adds it to the set, to make sure we're not adding duplicates
+       ##      random_concepts.add(concept)
+       ##      i += 1
+       ## # random_concepts_dict = {}
+       ## # for c in random_concepts:
+       ## #     random
+       ##  return random_concepts
+       ##          #{'type': type,
+       ##          #    type: theobj,
+       ##          #    'votes': theobj.votes.all()}
 
     @staticmethod
     def resource_uri():
