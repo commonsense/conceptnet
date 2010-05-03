@@ -512,7 +512,6 @@ class RandomConceptHandler(BaseHandler):
 
         for a in assertions:
             if len(random_concepts) >= limit:
-                print "Bigger"
                 break
             
             concept = a.surface1.concept
