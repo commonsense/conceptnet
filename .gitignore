@@ -11,10 +11,9 @@ pip-log.txt
 .coverage
 .bzr
 .bzrignore
-*.pickle
-*.pickle.gz
 *.train
 *.psql
+*.pickle.gz
 conceptnet_zh_*.txt
 db
 *~
