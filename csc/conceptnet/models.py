@@ -983,17 +983,16 @@ class RawAssertion(TimestampedModel, ScoredModel):
             language=lang
         )
         if len(existing) > 0:
-            # return early if this RawAssertion already exists
-            return existing[0]
-
-        raw_assertion = RawAssertion.objects.create(
-            frame=frame,
-            surface1=surface1,
-            surface2=surface2,
-            language=lang,
-            score=0,
-            creator=user
-        )
+            raw_assertion = existing[0]
+        else:
+            raw_assertion = RawAssertion.objects.create(
+                frame=frame,
+                surface1=surface1,
+                surface2=surface2,
+                language=lang,
+                score=0,
+                creator=user
+            )
         
         assertion, c = Assertion.objects.get_or_create(
             relation=frame.relation,
