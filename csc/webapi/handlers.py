@@ -17,9 +17,30 @@ BASE = "http://openmind.media.mit.edu/api/"
 basic_auth = HttpBasicAuthentication()
 
 class LanguageHandler(BaseHandler):
-    allowed_methods = ()
+    """
+    A GET request to this URL will show basic information about a language --
+    its ID and how many sentences (parsed or unparsed) exist in the database
+    for that language.
+
+    The sentence count is a cached value. It might become out of sync with the
+    actual number of sentences, but it's not supposed to.
+    """
+    allowed_methods = ('GET',)
     model = Language
     fields = ('id',)
+    
+    @throttle(600, 60, 'read')
+    def read(self, request, lang):
+        try:
+            lang = Language.get(lang)
+            return {'id': lang.id, 'sentence_count': lang.sentence_count}
+        except Language.DoesNotExist:
+            return rc.NOT_FOUND
+
+    # This is how you make examples for things that don't announce their own
+    # resource_uri.
+    example_uri = '/api/ja/'
+    example_uri_template = '/api/{lang}/'
 
 class RelationHandler(BaseHandler):
     allowed_methods = ()
@@ -76,7 +97,7 @@ class ConceptAssertionHandler(BaseHandler):
     
     The results will be limited to the *n* highest-scoring assertions.
     By default, this limit is 20, but you can set it up to 100 by changing
-    the *limit* in the URI.
+    the *limit* in the URL.
     """
     allowed_methods = ('GET',)
 
@@ -287,7 +308,6 @@ class AssertionHandler(BaseHandler):
     fields = ('relation', 'concept1', 'concept2', 'frequency', 'score',
     'language')
     
-    @throttle(600, 60, 'read')
     def read(self, request, lang, id):
         try:
             a = Assertion.objects.get(
@@ -424,9 +444,44 @@ class VoteHandler(BaseHandler):
     fields = ('user', 'vote')
 
 class UserHandler(BaseHandler):
-    allowed_methods = ()
+    """
+    **Checking users**: A GET request to this URL will confirm whether a user
+    exists. If the user exists, this returns a data structure containing their
+    username. If the user does not exist, it returns a 404 response.
+
+    **Creating users**: A POST request to this URL will create a user that does
+    not already exist. This takes two additional POST parameters:
+
+    - `password`: The password the new user should have.
+    - `email`: (Optional and not very important) The e-mail address to be
+      associated with the user in the database.
+
+    Do not use high-security passwords here. You're sending them over plain
+    HTTP, so they are not encrypted.
+    """
+    allowed_methods = ('GET', 'POST')
     model = User
     fields = ('username',)
+
+    @throttle(600, 60, 'read')
+    def read(self, request, username):
+        try:
+            return User.objects.get(username=username)
+        except User.DoesNotExist:
+            return rc.NOT_FOUND
+
+    @throttle(200, 60, 'add')
+    def create(self, request, username):
+        password = request.POST['password']
+        email = request.POST.get('email', '')
+        exists = User.objects.filter(username=username).count()
+        if exists > 0:
+            return rc.DUPLICATE_ENTRY
+        else:
+            return User.objects.create_user(username, email, password)
+
+    example_uri = '/api/user/verbosity/'
+    example_uri_template = '/api/user/{username}/'
 
 class RawAssertionHandler(BaseHandler):
     """
@@ -456,21 +511,24 @@ class RawAssertionHandler(BaseHandler):
     
 class RawAssertionByFrameHandler(BaseHandler):
     """
-    A GET request to this URL lists the RawAssertions that use a particular
+    **Getting assertions**: A GET request to this URL lists the RawAssertions
+    that use a particular
     sentence frame, specified by its ID. As with other queries that return a
     list, this returns 20 results by default, but you can ask for up to 100
     by changing the value of *limit*.
     
-    A POST request to this URL submits new knowledge to Open Mind. The
+    **Adding assertions**: A POST request to this URL submits new knowledge to
+    Open Mind. The
     POST parameters `text1` and `text2` specify the text that fills the blanks.
     
     You must either have a logged-in cookie or send `username` and
     `password` as additional parameters.
     
     Other optional parameters:
-    * `activity`: a string identifying what activity or application this
+
+    - `activity`: a string identifying what activity or application this
       request is coming from.
-    * `vote`: either 1 or -1. This will vote for or against the assertion after
+    - `vote`: either 1 or -1. This will vote for or against the assertion after
       you create it, something you often want to do.
     """
     allowed_methods = ('GET', 'POST')
@@ -508,41 +566,5 @@ class SentenceHandler(BaseHandler):
     model = Sentence
     fields = ('text', 'creator', 'language', 'score', 'created_on')
 
-
-
-
-class RandomConceptHandler(BaseHandler):
-    """
-    A GET request to this URL returns the surface form and text of NUM randoms concept
-
-    Setting the threshold value will only return concepts contained in assertions
-    scoring higher than the thresh value
-
-    """
-    allowed_methods = ('GET',)
-
-    @throttle(60, 60, 'read')
-
-    def read(self, request, lang, limit=2, thresh=2):
-        #TODO
-        pass
-
-        ## limit = int(limit)
-        ## thresh = int(thresh)
-        ## assertions = RawAssertion.objects.filter(score__gt=thresh, language=lang).select_related('surface1').order_by('?')
-        ## random_concepts = {}
-        ## for a in assertions:
-        ##     if len(random_concepts) >= limit:
-        ##         print "Bigger"
-        ##         break            
-        ##     concept = a.surface1.concept
-        ##     if concept not in random_concepts:
-        ##         random_concepts[concept] = {'surface': str(a.surface1), 'text': str(concept.text) }
-        ## return random_concepts.values()
-    
-    @staticmethod
-    def resource_uri():
-        return ('random_concept_handler', ['language_id', 'limit', 'thresh'])
-    example_args = {'lang': 'en', 'limit': '2', 'thresh': '2'}
 
 

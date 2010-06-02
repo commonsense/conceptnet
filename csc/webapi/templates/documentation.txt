@@ -50,7 +50,11 @@ REST requests
 -------------
 
 {% for doc in docs %}
-.. function:: {{ doc.get_resource_uri_template }}
+
+{{ doc.name }}
+.......................................
+
+.. function:: {{ doc.uri_template }}
 
     {{ doc.get_doc|default:""|safe }}
     Implemented by: :class:`csc.webapi.{{ doc.name }}`
