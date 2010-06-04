@@ -6,28 +6,29 @@ Document types
 
 Edge:
 
-- type: 'statement', 'assertion', 'semantic', 'dependency', 'feature'...
+- type: 'assertion', 'statement', 'dependency', ...
 - dataset: language
-- text: (best sentence)
+- text: best sentence, with [[links]]
+- nodes: list of at least 2 concepts
+- relation: IsA, PartOf, ...
+- frame: (objectID or null)
 - justifications: an AND/OR tree of reasons to believe it
-- nodes: (list; hopefully at least 2)
-- label: the label on the edge
-- frequency: how often it's true
 - confidence: generated from justifications
-- weight: generated from frequency and confidence
+- frequency: -10 to 10
+- weight: generated from confidence and frequency
 - valid: T/F
-- history: (list of [timestamp, description])
+- log: (list of [timestamp, description])
 
-Node:
+Concept:
 
-- type: 'node'
+- type: 'concept'
 - id: (normalized name)
 - text: (best un-normalized name)
 - dataset: language
 - edges: (list)
 - valid: T/F
 
-FreeText:
+Sentence:
 
 - type: 'sentence'
 - dataset
@@ -35,4 +36,11 @@ FreeText:
 - valid: T/F
 - confidence
 - justifications
+
+Frame:
+
+- text: has {1} and {2} blanks
+- goodness: 1-3
+- relation: IsA, PartOf, ...
+- frequency: -10 to 10
 
