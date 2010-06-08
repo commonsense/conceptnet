@@ -47,7 +47,6 @@ def get_db_config(param, default=''):
     if short_param in db_config: return db_config[short_param]
     return default
 
-
 def relative_to_db_config(path):
     if not os.path.isabs(path):
         path = os.path.join(db_config_dir, path)
@@ -64,6 +63,7 @@ ADMINS = ()
 
 MANAGERS = ADMINS
 
+# SQL database setup
 DATABASE_ENGINE = get_db_config('ENGINE')    # 'postgresql', 'mysql', 'sqlite3' or 'ado_mssql'.
 DATABASE_NAME = get_db_config('NAME')        # Or path to database file if using sqlite3.
 if DATABASE_ENGINE == 'sqlite3':
@@ -74,6 +74,13 @@ DATABASE_PASSWORD = get_db_config('PASSWORD', '') # Not used with sqlite3.
 DATABASE_HOST = get_db_config('HOST', '')        # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = get_db_config('PORT', '')        # Set to empty string for default. Not used with sqlite3.
 DATABASE_OPTIONS = get_db_config('OPTIONS', {})
+
+# MongoDB setup
+import mongoengine
+mongoengine.connect('conceptnet',
+                    host=db_config['MONGODB_HOST'],
+                    username=db_config['MONGODB_USER'],
+                    password=db_config['MONGODB_PASSWORD'])
 
 # Local time zone for this installation. All choices can be found here:
 # http://www.postgresql.org/docs/current/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
