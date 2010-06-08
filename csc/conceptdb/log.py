@@ -1,4 +1,8 @@
 import mongoengine as mon
 
 class Log(mon.Document):
-    NotImplemented
+    object = mon.GenericReferenceField()
+    action = mon.StringField()
+    data = mon.DictField()
+
+

@@ -54,7 +54,10 @@ class Justification(mon.EmbeddedDocument):
     confidence_score = mon.FloatField(default=0.0)
 
     @staticmethod
-    def default():
+    def empty():
+        """
+        Get the default, empty justification.
+        """
         return Justification(
             support_flat=[],
             oppose_flat=[],
