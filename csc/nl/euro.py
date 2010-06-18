@@ -373,11 +373,13 @@ class LemmatizedEuroNL(EuroNL):
 
             >>> en_nl.lemma_split("This is the testiest test that ever was tested")
             (u'testy test ever test', u'this is the 1iest 2 that 3 was 4ed')
+
+        If ``keep_stopwords`` is set, or if all words are stopwords,
+        then stopword removal is skipped.
         """
         if not isinstance(text, unicode): text = text.decode('utf-8')
         text = self.tokenize(text)
-        punct = string.punctuation.replace("'", "").replace('-',
-        '').replace("`", "")
+        punct = string.punctuation.replace("'", "").replace('-', '').replace("`", "")
         
         words = text.replace('/', ' ').split()
         words = [w.strip(punct).lower() for w in words]
