@@ -1,4 +1,3 @@
-from django.utils.functional import memoize
 import codecs
 import os
 
@@ -33,11 +32,13 @@ def get_nl(lang_code):
     Get an object that handles natural language operations for a given
     language, and remember it so that it doesn't have to be looked up again.
     """
+    if lang_code in cached_nl: return cached_nl[lang_code]
     # ignore variants when looking up the nl object
     lang_code = lang_code.split('-')[0]
     name = 'csc.nl.'+lang_code
-    return __import__(name, [], [], 'NL').NL()
-get_nl = memoize(get_nl, cached_nl, 1)
+    result = __import__(name, [], [], 'NL').NL()
+    cached_nl[lang_code] = result
+    return result
 
 class NLTools(object):
     """
