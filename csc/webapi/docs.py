@@ -27,8 +27,16 @@ def documentation_view(request):
                         example_url = example_url.replace('{%s}' % arg, str(value))
                     doc.example_url = example_url+'query.yaml'
                     doc.example_result = client.get(doc.example_url).content
+                doc.uri_template = doc.get_resource_uri_template()
                 docs.append(doc)
-    docs.sort(key=lambda doc: doc.get_resource_uri_template())
+            elif hasattr(klass, 'example_uri'):
+                doc = generate_doc(klass)
+                example_url = klass.example_uri
+                doc.example_url = example_url+'query.yaml'
+                doc.example_result = client.get(doc.example_url).content
+                doc.uri_template = klass.example_uri_template
+                docs.append(doc)
+    docs.sort(key=lambda doc: doc.uri_template)
     t = loader.get_template('documentation.txt')
     rst = t.render(Context({'docs': docs, 'API_BASE': API_BASE}))
     return HttpResponse(rst, mimetype='text/plain')

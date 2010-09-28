@@ -8,6 +8,8 @@ from csc.webapi.handlers import *
 Q = r'(query\.(?P<emitter_format>.+))?$'
 
 urlpatterns = patterns('',
+    url(r'^(?P<lang>[^/]+)/'+Q,
+        Resource(LanguageHandler), name='language_handler'),
     url(r'^(?P<lang>.+)/concept/(?P<concept>[^/]*)/'+Q,
         Resource(ConceptHandler), name='concept_handler'),
     url(r'^(?P<lang>.+)/concept/(?P<concept>[^/]*)/assertions/'+Q,
@@ -42,6 +44,10 @@ urlpatterns = patterns('',
         Resource(RawAssertionHandler), name='raw_assertion_handler'),
     url(r'^(?P<lang>.+)/frequency/(?P<text>[^/]*)/'+Q,
         Resource(FrequencyHandler), name='frequency_handler'),
+    url(r'^(?P<lang>.+)/assertionfind/(?P<relation>[^/]+)/(?P<text1>[^/]+)/(?P<text2>[^/]+)/'+Q,
+        Resource(AssertionFindHandler), name='assertion_find_handler'),
+    url(r'^user/(?P<username>.+)/'+Q,
+        Resource(UserHandler), name='user_handler'),
     url(r'docs.txt$',
         documentation_view, name='documentation_view')
 )
