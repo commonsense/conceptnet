@@ -306,7 +306,7 @@ class AssertionHandler(BaseHandler):
     allowed_methods = ('GET',)
     model = Assertion
     fields = ('relation', 'concept1', 'concept2', 'frequency', 'score',
-    'language')
+    'language', 'best_raw')
     
     def read(self, request, lang, id):
         try:
@@ -321,6 +321,22 @@ class AssertionHandler(BaseHandler):
     def resource_uri():
         return ('assertion_handler', ['language_id', 'id'])
     example_args = {'lang': 'en', 'id': '25'}
+
+class AssertionToRawHandler(BaseHandler):
+    """
+    A GET request to this URL will list the RawAssertions (natural language
+    statements) associated with a given Assertion ID.
+    """
+    @throttle(200, 60, 'search')
+    def read(self, request, lang, id):
+        raw_list = RawAssertion.objects.filter(language__id=lang, assertion__id=id)
+        return raw_list
+
+    @staticmethod
+    def resource_uri():
+        return ('assertion_to_raw_handler', ['language_id', 'assertion_id'])
+    example_args = {'lang': 'en',
+                    'id': 31445}
 
 class AssertionFindHandler(BaseHandler):
     """
