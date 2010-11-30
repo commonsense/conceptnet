@@ -2,12 +2,13 @@ from csc.util import queryset_foreach
 from csc.conceptnet4.models import Sentence, Assertion, RawAssertion, Vote
 
 def sort_and_check():
-    all_raw = RawAssertion.objects.all().order_by('language', 'surface1__text', 'surface2__text', 'frame__id')
+    all_raw = RawAssertion.objects.filter(language__id='zh-Hant').order_by('language', 'surface1__text', 'surface2__text', 'frame__id')
     print "Checking for duplicates."
     prev = None
     for raw in all_raw:
+        print raw.id
         if equivalent(prev, raw):
-            print "%s[%s] == %s[%s]" % (prev, prev.creator.username, raw, raw.creator.username)
+            print (u"%s[%s] == %s[%s]" % (prev, prev.creator.username, raw, raw.creator.username)).encode('utf-8')
             prev = switch_raw(raw, prev)
         else:
             prev = raw

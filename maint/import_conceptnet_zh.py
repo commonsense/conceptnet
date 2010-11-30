@@ -1,11 +1,14 @@
 from csc.conceptnet.models import *
 import codecs
+activity, _ = Activity.objects.get_or_create(name='Pet game')
 zh = Language.get('zh-Hant')
-activity = Activity.objects.get(name='Pet game')
-
 def run(filename):
     f = codecs.open(filename, encoding='utf-8')
+    count = 0
     for line in f:
+        if filename.endswith('1.txt') and count < 77600:
+            count += 1
+            continue
         line = line.strip()
         if not line: continue
         username, frame_id, text1, text2 = line.split(', ')
@@ -19,9 +22,14 @@ def run(filename):
         )
         frame = Frame.objects.get(id=int(frame_id))
         assert frame.language == zh
-        got = RawAssertion.make(user, frame, text1, text2, activity)
-        print got
+        try:
+            got = RawAssertion.make(user, frame, text1, text2, activity)
+            print got
+        except RawAssertion.MultipleObjectsReturned:
+            print "got multiple"
     f.close()
 
-for num in xrange(3,9):
-    run('conceptnet_zh_part%d.txt' % num)
+run('conceptnet_zh_part9.txt')
+run('conceptnet_zh_part10.txt')
+run('conceptnet_zh_api.txt')
+

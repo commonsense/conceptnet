@@ -57,7 +57,7 @@ def relative_to_db_config(path):
 # This sets the Python path to include the distributed libraries.
 import csc.lib
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = ()
@@ -142,7 +142,7 @@ INSTALLED_APPS = (
     'csc.nl',
     'voting',
     'events',
-    'south',
+#    'south',
 #    'django.contrib.markup',
 #    'corpus.parse',
 #    'realm',

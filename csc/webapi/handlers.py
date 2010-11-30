@@ -306,7 +306,7 @@ class AssertionHandler(BaseHandler):
     allowed_methods = ('GET',)
     model = Assertion
     fields = ('relation', 'concept1', 'concept2', 'frequency', 'score',
-    'language', 'best_raw')
+    'language')
     
     def read(self, request, lang, id):
         try:
