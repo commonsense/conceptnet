@@ -57,7 +57,7 @@ def relative_to_db_config(path):
 # This sets the Python path to include the distributed libraries.
 import csc.lib
 
-DEBUG = False
+DEBUG = db_config.get('DEBUG', False)
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = ()
@@ -158,7 +158,7 @@ if USE_DJANGO_EVOLUTION:
         pass
 
 # Serve the API if we can.
-SERVE_API = False
+SERVE_API = db_config.get('SERVE_API', False)
 if SERVE_API:
     try:
         import csc.webapi
