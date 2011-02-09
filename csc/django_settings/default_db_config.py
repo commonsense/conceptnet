@@ -13,3 +13,6 @@ DB_PORT = ""
 DB_USER = ""
 DB_PASSWORD = ""
 DB_SCHEMAS = ""
+
+DEBUG = True
+SERVE_API = True
