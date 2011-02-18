@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 packages = find_packages(exclude=['maint'])
-version_str = '4.0rc4'
+version_str = '4.0'
 
 setup(  name='ConceptNet',
         version=version_str,
@@ -12,11 +12,7 @@ setup(  name='ConceptNet',
         url='http://conceptnet.media.mit.edu/',
         packages=packages,
         include_package_data=False,
-        namespace_packages = ['csc'],
         install_requires=['csc-utils', 'django', 'south'],
-        package_data={'csc.nl': ['mblem/*.pickle', 'en/*.txt', 'es/stop.txt',
-                                 'hu/stop.txt', 'nl/stop.txt', 'pt/stop.txt']},
-
         # Metadata
         license = "GPL v3",
         )
