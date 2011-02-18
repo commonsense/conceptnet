@@ -12,7 +12,7 @@ setup(  name='ConceptNet',
         url='http://conceptnet.media.mit.edu/',
         packages=packages,
         include_package_data=False,
-        install_requires=['csc-utils', 'django', 'south'],
+        install_requires=['csc-utils >= 0.6', 'django', 'south'],
         # Metadata
         license = "GPL v3",
         )
