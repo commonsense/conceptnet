@@ -1,8 +1,7 @@
 __version__ = "4.0rc2"
 from django.db import models
 from django.db.models import Q
-from csc.corpus.models import Language, Sentence, User, ScoredModel
-from csc.nl.models import Frequency
+from csc.corpus.models import Language, Sentence, User, ScoredModel, Frequency
 from events.models import Event, Activity
 from voting.models import Vote, SCORES
 from django.contrib.contenttypes import generic

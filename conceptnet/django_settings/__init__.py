@@ -33,10 +33,10 @@ else:
         db_config_dir = os.path.abspath(os.path.dirname(db_config.__file__))
         db_config = db_config.__dict__
     except ImportError:
-        from csc.django_settings import default_db_config
+        from conceptnet.django_settings import default_db_config
         db_config = default_db_config.__dict__
         if not os.path.exists(db_config['DB_NAME']):
-            from csc.django_settings import db_downloader
+            from conceptnet.django_settings import db_downloader
             if not db_downloader.prompt_for_download(db_config['DB_NAME']):
                 raise SystemExit
 

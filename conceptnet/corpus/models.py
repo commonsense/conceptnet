@@ -194,4 +194,24 @@ class DependencyParse(models.Model):
         return u'%s(%s_%d, %s_%d) (sent %d)' % (
             self.linktype, self.word1, self.index1, self.word2, self.index2,
             self.sentence_id)
-    
+
+class Frequency(models.Model):
+    """
+    A Frequency is attached to an :class:`Assertion` to indicate how often
+    it is the case. Each Frequency is attached to a natural-language modifier
+    (generally an adverb), and has a value from -10 to 10.
+    """
+    language = models.ForeignKey(Language)
+    text = models.CharField(max_length=50, blank=True,
+                            help_text='The frequency adverb used (e.g., "always", "sometimes", "never"). Empty means that the sentence has no frequency adverb.')
+    # FIXME: is this help text still valid?
+    value = models.IntegerField(help_text='A number between -10 and 10 indicating a rough numerical frequency to associate with this word. "always" would be 10, "never" would be -10, and not specifying a frequency adverb in English is specified to be 5.')
+
+    def __unicode__(self):
+        return u'<%s: "%s" (%d)>' % (self.language.id, self.text, self.value)
+
+    class Meta:
+        unique_together = (('language', 'text'),)
+        verbose_name = 'frequency adverb'
+        verbose_name_plural = 'frequency adverbs'
+        db_table = 'nl_frequency'
