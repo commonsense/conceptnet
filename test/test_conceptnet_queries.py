@@ -1,5 +1,5 @@
 from nose.tools import *
-from csc.conceptnet4.models import *
+from conceptnet.models import *
 from nose.plugins.attrib import *
 def setup():
     en = Language.get('en')
