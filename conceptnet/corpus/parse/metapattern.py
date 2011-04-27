@@ -1,5 +1,5 @@
 from pymeta.grammar import OMeta, ParseError
-from csc.corpus.models import Sentence, TaggedSentence
+from conceptnet.corpus.models import Sentence, TaggedSentence
 from itertools import chain
 import sys
 

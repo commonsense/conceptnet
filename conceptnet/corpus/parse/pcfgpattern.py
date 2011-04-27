@@ -2,8 +2,8 @@ import nltk
 from collections import defaultdict
 from nltk.cfg import Nonterminal
 from divisi.util import get_picklecached_thing
-from csc.corpus.models import Pattern, Sentence, Language
-from csc.nl.euro import tokenize, untokenize
+from conceptnet.corpus.models import Pattern, Sentence, Language
+from simplenlp.euro import tokenize, untokenize
 from nltk.corpus.reader import BracketParseCorpusReader
 from nltk.corpus.util import LazyCorpusLoader
 import string

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import sys, traceback
-from csc.conceptnet4.models import Assertion, Batch, RawAssertion, Frame,\
+from conceptnet.models import Assertion, Batch, RawAssertion, Frame,\
   Frequency, Relation, SurfaceForm, Concept, Rating
-from csc.corpus.models import Sentence, Language, Activity
+from conceptnet.corpus.models import Sentence, Language, Activity
 from django.contrib.auth.models import User
 from pcfgpattern import pattern_parse
 from django.core.paginator import Paginator

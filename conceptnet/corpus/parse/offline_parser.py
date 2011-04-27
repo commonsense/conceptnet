@@ -2,7 +2,7 @@
 import sys, traceback
 from pcfgpattern import pattern_parse
 import yaml
-from csc.conceptnet.models import Sentence, Language
+from conceptnet.models import Sentence, Language
 from django.core.paginator import Paginator
 #from django.db import transaction
 

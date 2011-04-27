@@ -2,7 +2,7 @@
 from south.db import db
 from south.models import MigrationHistory
 from django.db import models
-from csc.conceptnet.models import *
+from conceptnet.models import *
 
 class Migration:
     

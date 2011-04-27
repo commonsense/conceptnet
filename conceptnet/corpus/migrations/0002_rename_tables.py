@@ -1,7 +1,7 @@
 
 from south.db import db
 from django.db import models
-from csc.corpus.models import *
+from conceptnet.corpus.models import *
 
 class Migration:
     

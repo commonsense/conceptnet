@@ -92,7 +92,7 @@ class ConceptHandler(BaseHandler):
 class ConceptAssertionHandler(BaseHandler):
     """
     A GET request to this URL will look up all the
-    :class:`Assertions <csc.conceptnet.models.Assertion>` that this
+    :class:`Assertions <conceptnet.models.Assertion>` that this
     Concept participates in with a score of at least 1.
     
     The results will be limited to the *n* highest-scoring assertions.
@@ -118,7 +118,7 @@ class ConceptAssertionHandler(BaseHandler):
 class ConceptSurfaceHandler(BaseHandler):
     """
     A GET request to this URL will look up all the
-    :class:`SurfaceForms <csc.conceptnet.models.SurfaceForm>` that
+    :class:`SurfaceForms <conceptnet.models.SurfaceForm>` that
     correspond to this Concept -- that is, the phrases of natural language
     that are considered to reduce to this Concept.
     
@@ -155,8 +155,8 @@ class FeatureHandler(BaseHandler):
 class ConceptFeatureHandler(BaseHandler):
     """
     A GET request to this URL will return a list of all existing
-    :class:`Features <csc.conceptnet.models.Features>` built on the given
-    :class:`Concept <csc.conceptnet.models.Concept>`.
+    :class:`Features <conceptnet.models.Features>` built on the given
+    :class:`Concept <conceptnet.models.Concept>`.
 
     The features will be described in a short form: each feature will be a
     dictionary containing its *direction*, the *relation* involved, and the
@@ -187,12 +187,12 @@ class ConceptFeatureHandler(BaseHandler):
 class FeatureQueryHandler(BaseHandler):
     """
     A GET request to this URL will look up the
-    :class:`Assertions <csc.conceptnet.models.Assertion>` that contain a
-    certain :class:`Feature <csc.conceptnet.models.Feature>`.
+    :class:`Assertions <conceptnet.models.Assertion>` that contain a
+    certain :class:`Feature <conceptnet.models.Feature>`.
     
     The parameter "{dir}feature" means that the URL should contain either
     `leftfeature/` or `rightfeature/`, depending on what form of feature
-    you are looking for. See the :class:`Feature <csc.conceptnet.models.Feature>`
+    you are looking for. See the :class:`Feature <conceptnet.models.Feature>`
     documentation for more explanation.
     
     As with other queries that return a

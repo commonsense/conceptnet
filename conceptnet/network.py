@@ -5,7 +5,7 @@ Requires the NetworkX library.
 """
 import networkx as nx
 import codecs
-from csc.conceptnet.models import Assertion
+from conceptnet.models import Assertion
 
 def make_network(lang):
     """

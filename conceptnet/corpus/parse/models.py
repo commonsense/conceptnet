@@ -1,6 +1,6 @@
 from django.db import models
-from csc.corpus.models import Language
-from csc.conceptnet4.models import Relation
+from conceptnet.corpus.models import Language
+from conceptnet.models import Relation
 
 class FunctionFamilyDetector(object):
     def __init__(self,kb,language,family):

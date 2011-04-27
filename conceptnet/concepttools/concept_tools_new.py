@@ -1,5 +1,5 @@
-from csc.conceptnet4.models import Concept
-from csc.conceptnet4.analogyspace import *
+from conceptnet.models import Concept
+from conceptnet.analogyspace import *
 import operator
 import cPickle as pickle
 import os

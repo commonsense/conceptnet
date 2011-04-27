@@ -1,8 +1,8 @@
 from csc.divisi.util import get_picklecached_thing
 from csc.divisi.blend import Blend
 from csc.divisi.flavors import ConceptByFeatureMatrix
-from csc.conceptnet.models import en
-from csc.conceptnet.analogyspace import conceptnet_2d_from_db, make_category
+from conceptnet.models import en
+from conceptnet.analogyspace import conceptnet_2d_from_db, make_category
 import os
 
 try:

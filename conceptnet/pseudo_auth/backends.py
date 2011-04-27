@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User as DjangoUser, check_password
-from csc.pseudo_auth.models import LegacyUser
+from conceptnet.pseudo_auth.models import LegacyUser
 
 class LegacyBackend:
     def authenticate(self, username=None, password=None):

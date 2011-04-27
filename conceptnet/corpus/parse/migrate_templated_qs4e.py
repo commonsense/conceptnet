@@ -8,7 +8,7 @@ from corpus.models import Sentence, Language, Activity
 from django.contrib.auth.models import User
 from itertools import islice
 import yaml
-from csc.util import queryset_foreach
+from csc_utils import queryset_foreach
 
 csamoa4_activity = Activity.objects.get(name='csamoa4 self-rating')
 def process_predicate(pred):

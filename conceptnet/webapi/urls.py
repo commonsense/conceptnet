@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import *
 from piston.resource import Resource
-from csc.webapi.docs import documentation_view
-from csc.webapi.handlers import *
+from conceptnet.webapi.docs import documentation_view
+from conceptnet.webapi.handlers import *
 
 # This gives a way to accept "query.foo" on the end of the URL to set the
 # format to 'foo'. "?format=foo" works as well.

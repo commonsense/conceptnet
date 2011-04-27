@@ -1,7 +1,7 @@
-from csc.conceptnet.models import *
+from conceptnet.models import *
 from piston.handler import BaseHandler
 from piston.doc import generate_doc
-from csc.webapi import handlers
+from conceptnet.webapi import handlers
 
 from django.test.client import Client
 from django.shortcuts import render_to_response

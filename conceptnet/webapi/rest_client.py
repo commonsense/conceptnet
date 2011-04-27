@@ -69,7 +69,7 @@ def lookup_concept_raw(language, concept_name):
     existing surface text, such as "webbed feet".
 
     Use :func:`lookup_concept_from_nl` to look up a concept from any natural
-    language text. This requires the `csc.nl` module.
+    language text. This requires the `simplenlp` module.
     """
     return lookup('concept', language, concept_name)
 
@@ -86,7 +86,7 @@ def lookup_concept_from_surface(language, surface_text):
 def lookup_concept_from_nl(language, text):
     """
     Look up a concept using any natural language text that represents it.
-    This function requires the :mod:`csc.nl` module, or the `standalone_nlp`
+    This function requires the :mod:`simplenlp` module, or the `standalone_nlp`
     version of it, to normalize natural language text into a raw concept name
     """
     try:
