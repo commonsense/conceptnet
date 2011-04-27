@@ -138,7 +138,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'conceptnet.pseudo_auth',
     'conceptnet.corpus',
-    'conceptnet.conceptnet',
+    'conceptnet',
     'simplenlp',
     'voting',
     'events',
