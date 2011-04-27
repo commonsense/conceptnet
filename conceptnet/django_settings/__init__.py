@@ -55,7 +55,7 @@ def relative_to_db_config(path):
 
 
 # This sets the Python path to include the distributed libraries.
-import csc.lib
+import conceptnet.lib
 
 DEBUG = db_config.get('DEBUG', False)
 TEMPLATE_DEBUG = DEBUG
@@ -124,7 +124,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 AUTHENTICATION_BACKENDS = (
-        'csc.pseudo_auth.backends.LegacyBackend',
+        'conceptnet.pseudo_auth.backends.LegacyBackend',
         'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -136,10 +136,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'csc.pseudo_auth',
-    'csc.corpus',
-    'csc.conceptnet',
-    'csc.nl',
+    'conceptnet.pseudo_auth',
+    'conceptnet.corpus',
+    'conceptnet.conceptnet',
+    'simplenlp',
     'voting',
     'events',
 #    'south',
@@ -161,9 +161,8 @@ if USE_DJANGO_EVOLUTION:
 SERVE_API = db_config.get('SERVE_API', False)
 if SERVE_API:
     try:
-        import csc.webapi
-        import csc.webapi.handlers
-        INSTALLED_APPS += ('csc.webapi',)
+        import conceptnet.webapi.handlers
+        INSTALLED_APPS += ('conceptnet.webapi',)
     except ImportError:
         pass
 
