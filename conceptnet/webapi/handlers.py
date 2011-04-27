@@ -2,10 +2,10 @@ from piston.handler import BaseHandler, rc
 from piston.doc import generate_doc
 from piston.utils import throttle
 from piston.authentication import HttpBasicAuthentication
-from csc.conceptnet.models import Concept, Relation, SurfaceForm, Frame,\
+from conceptnet.models import Concept, Relation, SurfaceForm, Frame,\
   Assertion, RawAssertion, LeftFeature, RightFeature, Feature
-from csc.corpus.models import Language, Sentence
-from csc.nl.models import Frequency
+from conceptnet.corpus.models import Language, Sentence
+from conceptnet.corpus.models import Frequency
 from voting.models import Vote
 from events.models import Activity
 from django.contrib.auth import authenticate, login
