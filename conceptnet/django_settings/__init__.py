@@ -144,18 +144,7 @@ INSTALLED_APPS = (
     'events',
 #    'south',
 #    'django.contrib.markup',
-#    'corpus.parse',
-#    'realm',
 )
-
-# Install django_evolution, if available.
-USE_DJANGO_EVOLUTION = False
-if USE_DJANGO_EVOLUTION:
-    try:
-        import django_evolution
-        INSTALLED_APPS += ('django_evolution',)
-    except ImportError:
-        pass
 
 # Serve the API if we can.
 SERVE_API = db_config.get('SERVE_API', False)
@@ -187,21 +176,3 @@ except ImportError:
 
 if memcache:
     CACHE_BACKEND="memcached://127.0.0.1:11211"
-
-## YAML serialization is no longer important.
-#SERIALIZATION_MODULES = {
-#    'myyaml': 'serialize.pyyaml'
-#}
-
-class PsycoMiddleware(object):
-    """
-    This middleware enables the psyco extension module which can massively
-    speed up the execution of any Python code.
-    """
-    def process_request(self, request):
-        try:
-            import psyco
-            psyco.full()
-        except ImportError:
-            pass
-        return None
