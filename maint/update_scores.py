@@ -1,5 +1,5 @@
-from csc.util import queryset_foreach
-from csc.conceptnet.models import Sentence, Assertion, RawAssertion
+from csc_utils.batch import queryset_foreach
+from conceptnet.models import Sentence, Assertion, RawAssertion
 
 queryset_foreach(Assertion.objects.all(), lambda x: x.update_score(),
 batch_size=100)

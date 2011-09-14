@@ -9,9 +9,9 @@ settings.configure(
     INSTALLED_APPS=(
         'django.contrib.auth',
         'django.contrib.contenttypes',
-        'csc.corpus',
-        'csc.conceptnet',
-        'csc.nl',
+        'conceptnet.corpus',
+        'conceptnet',
+        'simplenlp',
         'voting',
         'events',
         'south'))
