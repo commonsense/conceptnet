@@ -1,5 +1,5 @@
 from django.contrib import admin
-from csc.conceptnet4.models import Frequency, Frame, RawAssertion, Concept,\
+from conceptnet.models import Frequency, Frame, RawAssertion, Concept,\
 Assertion, Relation
 
 for model in (RawAssertion, Concept, Assertion, Relation):

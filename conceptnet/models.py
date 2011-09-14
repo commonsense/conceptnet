@@ -1,11 +1,11 @@
 __version__ = "4.0rc2"
 from django.db import models
 from django.db.models import Q
-from csc.corpus.models import Language, Sentence, User, ScoredModel, Frequency
+from conceptnet.corpus.models import Language, Sentence, User, ScoredModel, Frequency
 from events.models import Event, Activity
 from voting.models import Vote, SCORES
 from django.contrib.contenttypes import generic
-from csc.util import cached
+from csc_utils import cached
 from datetime import datetime
 from urllib import quote as urlquote
 import re
@@ -52,7 +52,7 @@ class Relation(models.Model):
     def get(cls, name):
         # Check if the parameter is already a Relation. We don't use
         # isinstance in case of accidental multiple imports (e.g.,
-        # csc.conceptnet4.models vs conceptnet4.models).
+        # conceptnet.models vs conceptnet4.models).
         if hasattr(name, 'id'):
             return name
         return cls.objects.get(name=name)

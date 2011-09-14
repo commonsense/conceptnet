@@ -9,7 +9,7 @@ from voting.models import Vote
 from events.models import Event, Activity
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from csc.nl import get_nl
+from simplenlp import get_nl
 import re
 
 class ScoredModel(object):
@@ -108,7 +108,7 @@ class Language(models.Model):
         """
         A collection of natural language tools for a language.
 
-        See :mod:`csc.nl` for more information on using these tools.
+        See :mod:`simplenlp` for more information on using these tools.
         """
         return get_nl(self.id)
 

@@ -5,7 +5,7 @@ Requires the NetworkX library.
 """
 import networkx as nx
 import codecs
-from csc.conceptnet.models import Assertion
+from conceptnet.models import Assertion
 
 def make_network(lang):
     """
@@ -17,7 +17,7 @@ def make_network(lang):
     for text1, text2, rel, score, freq in assertions.values_list(
         'concept1__text', 'concept2__text', 'relation__name', 'score',
         'frequency__value').iterator():
-        if text1 and text2:
+        if text1 and text2 and text1 != text2:
             graph.add_edge(text1, text2, rel=rel, score=score, freq=freq)
     return graph
 

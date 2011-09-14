@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from csc.corpus.parse.pcfgpattern import *
+from conceptnet.corpus.parse.pcfgpattern import *
 __test__ = False
 
 def textrepr(rel, matchdict):

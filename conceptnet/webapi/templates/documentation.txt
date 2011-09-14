@@ -57,7 +57,7 @@ REST requests
 .. function:: {{ doc.uri_template }}
 
     {{ doc.get_doc|default:""|safe }}
-    Implemented by: :class:`csc.webapi.{{ doc.name }}`
+    Implemented by: :class:`conceptnet.webapi.{{ doc.name }}`
 
     {% for method in doc.useful_methods %}
     .. method:: {{ method.name }}({{ method.signature }})

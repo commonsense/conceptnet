@@ -1,10 +1,10 @@
 from csc import divisi2
-from csc.conceptnet.models import Assertion, Relation, RawAssertion, Feature
-from csc.corpus.models import Language
+from conceptnet.models import Assertion, Relation, RawAssertion, Feature
+from conceptnet.corpus.models import Language
 from math import log, sqrt
 import logging
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('csc.conceptnet.analogyspace2')
+logger = logging.getLogger('conceptnet.analogyspace2')
 
 DEFAULT_IDENTITY_WEIGHT = 0
 DEFAULT_CUTOFF = 5
@@ -66,7 +66,7 @@ def rating_quads(lang, cutoff=DEFAULT_CUTOFF, filter=None):
     A django.db.models.Q object passed to filter will be applied to
     the Vote queryset.
     '''
-    from csc.conceptnet.models import AssertionVote
+    from conceptnet.models import AssertionVote
     ratings = AssertionVote.objects.filter(
         assertion__concept1__num_assertions__gte=cutoff,
         assertion__concept2__num_assertions__gte=cutoff)
@@ -78,7 +78,7 @@ def rating_quads(lang, cutoff=DEFAULT_CUTOFF, filter=None):
 
 def rawassertion_quads(lang, cutoff=DEFAULT_CUTOFF):
     # Experiment: deal with RawAssertions only.
-    from csc.conceptnet4.models import RawAssertion
+    from conceptnet.models import RawAssertion
     queryset = RawAssertion.objects.filter(
         score__gt=0,
         surface1__concept__num_assertions__gte=cutoff,

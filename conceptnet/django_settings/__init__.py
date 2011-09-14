@@ -55,7 +55,7 @@ def relative_to_db_config(path):
 
 
 # This sets the Python path to include the distributed libraries.
-import csc.lib
+import conceptnet.lib
 
 DEBUG = db_config.get('DEBUG', False)
 TEMPLATE_DEBUG = DEBUG
@@ -124,7 +124,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 AUTHENTICATION_BACKENDS = (
-        'csc.pseudo_auth.backends.LegacyBackend',
+        'conceptnet.pseudo_auth.backends.LegacyBackend',
         'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -136,34 +136,22 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'csc.pseudo_auth',
-    'csc.corpus',
-    'csc.conceptnet',
-    'csc.nl',
+    'conceptnet.pseudo_auth',
+    'conceptnet.corpus',
+    'conceptnet',
+    'simplenlp',
     'voting',
     'events',
 #    'south',
 #    'django.contrib.markup',
-#    'corpus.parse',
-#    'realm',
 )
-
-# Install django_evolution, if available.
-USE_DJANGO_EVOLUTION = False
-if USE_DJANGO_EVOLUTION:
-    try:
-        import django_evolution
-        INSTALLED_APPS += ('django_evolution',)
-    except ImportError:
-        pass
 
 # Serve the API if we can.
 SERVE_API = db_config.get('SERVE_API', False)
 if SERVE_API:
     try:
-        import csc.webapi
-        import csc.webapi.handlers
-        INSTALLED_APPS += ('csc.webapi',)
+        import conceptnet.webapi.handlers
+        INSTALLED_APPS += ('conceptnet.webapi',)
     except ImportError:
         pass
 
@@ -188,21 +176,3 @@ except ImportError:
 
 if memcache:
     CACHE_BACKEND="memcached://127.0.0.1:11211"
-
-## YAML serialization is no longer important.
-#SERIALIZATION_MODULES = {
-#    'myyaml': 'serialize.pyyaml'
-#}
-
-class PsycoMiddleware(object):
-    """
-    This middleware enables the psyco extension module which can massively
-    speed up the execution of any Python code.
-    """
-    def process_request(self, request):
-        try:
-            import psyco
-            psyco.full()
-        except ImportError:
-            pass
-        return None
