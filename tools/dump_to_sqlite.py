@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # This one should run in the ConceptNet Django environment.
-from csc.conceptnet.models import Concept # just for the environment setup.
+from conceptnet.models import Concept # just for the environment setup.
 from django.db.models import get_models
 from django.db.models.query import QuerySet
-from csc.util.batch import Status
+from csc_utils.batch import Status
 import sys, sqlite3
 
 models_to_dump = '''
 Vote RawAssertion Frame SurfaceForm Assertion
-Relation Frequency Concept FunctionClass FunctionWord Language
+Relation Frequency Concept Language
 Sentence User ContentType Activity Batch
 '''.strip().split()
 

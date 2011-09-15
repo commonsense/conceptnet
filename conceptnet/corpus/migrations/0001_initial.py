@@ -47,6 +47,15 @@ class Migration:
         ))
         db.send_create_signal('corpus', ['Sentence'])
         
+        # Adding model 'Frequency'
+        db.create_table('nl_frequency', (
+            ('id', orm['corpus.Frequency:id']),
+            ('language', orm['corpus.Frequency:language']),
+            ('text', orm['corpus.Frequency:text']),
+            ('value', orm['corpus.Frequency:value']),
+        ))
+        db.send_create_signal('corpus', ['Frequency'])
+        
     
     
     def backwards(self, orm):
@@ -114,6 +123,13 @@ class Migration:
             'id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'primary_key': 'True'}),
             'name': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'sentence_count': ('django.db.models.fields.IntegerField', [], {'default': '0'})
+        },
+        'corpus.frequency': {
+            'Meta': {'db_table': "'nl_frequency'"},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'language': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['corpus.Language']"}),
+            'value': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'text': ('django.db.models.fields.TextField', [], {}),
         },
         'corpus.sentence': {
             'Meta': {'db_table': "'sentences'"},
