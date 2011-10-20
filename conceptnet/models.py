@@ -5,7 +5,7 @@ from conceptnet.corpus.models import Language, Sentence, User, ScoredModel, Freq
 from events.models import Event, Activity
 from voting.models import Vote, SCORES
 from django.contrib.contenttypes import generic
-from csc_utils import cached
+from csc_utils.cache import cached
 from datetime import datetime
 from urllib import quote as urlquote
 import re

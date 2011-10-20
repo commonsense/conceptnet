@@ -31,13 +31,14 @@ class ScoredModel(object):
         """
         return getattr(Vote.objects.get_for_user(self, user), 'vote', None)
 
-    def set_rating(self, user, val, activity):
+    def set_rating(self, user, val, activity=None):
         """
         Set a user's Vote on a certain object. If the user has previously voted
         on that object, it removes the old vote.
         """
         Vote.objects.record_vote(self, user, val)
-        Event.record_event(self, user, activity)
+        if activity is not None:
+            Event.record_event(self, user, activity)
         #self.update_score()
 
     def update_score(self):
