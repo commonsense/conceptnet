@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 packages = find_packages(exclude=['maint'])
-version_str = '4.0.0'
+version_str = '4.0.1'
 
 setup(  name='ConceptNet',
         version=version_str,
