@@ -85,7 +85,7 @@ class ConceptHandler(BaseHandler):
             return rc.NOT_FOUND
     
     @staticmethod
-    def resource_uri():
+    def resource_uri(*args):
         return ('concept_handler', ['language_id', 'text'])
     example_args = {'lang': 'en', 'concept': 'duck'}
 
@@ -111,7 +111,7 @@ class ConceptAssertionHandler(BaseHandler):
             return rc.NOT_FOUND
 
     @staticmethod
-    def resource_uri():
+    def resource_uri(*args):
         return ('concept_assertion_handler', ['language_id', 'concept', 'limit'])
     example_args = {'lang': 'en', 'concept': 'web%20foot', 'limit': 5}
 
@@ -138,7 +138,7 @@ class ConceptSurfaceHandler(BaseHandler):
             return rc.NOT_FOUND
 
     @staticmethod
-    def resource_uri():
+    def resource_uri(*args):
         return ('concept_surface_handler', ['language_id', 'concept', 'limit'])
     example_args = {'lang': 'en', 'concept': 'web%20foot', 'limit': 5}
 
@@ -180,7 +180,7 @@ class ConceptFeatureHandler(BaseHandler):
         return left_repr + right_repr
 
     @staticmethod
-    def resource_uri():
+    def resource_uri(*args):
         return ('concept_feature_handler', ['language_id', 'text'])
     example_args = {'lang': 'en', 'concept': 'moose'}
 
@@ -221,7 +221,7 @@ class FeatureQueryHandler(BaseHandler):
         return feature.matching_assertions()[:limit]
 
     @staticmethod
-    def resource_uri():
+    def resource_uri(*args):
         return ('feature_query_handler', ['language_id', 'dir', 'relation', 'concept', 'limit'])
     example_args = {'lang': 'en', 'dir': 'right', 'relation': 'HasA',
                     'concept': 'web%20foot', 'limit': 5}
@@ -245,7 +245,7 @@ class FrequencyHandler(BaseHandler):
         except Frequency.DoesNotExist: return rc.NOT_FOUND
     
     @staticmethod
-    def resource_uri():
+    def resource_uri(*args):
         return ('frequency_handler', ['language_id', 'text'])
     example_args = {'lang': 'en', 'text': 'sometimes'}
 
@@ -267,7 +267,7 @@ class SurfaceFormHandler(BaseHandler):
         except SurfaceForm.DoesNotExist: return rc.NOT_FOUND
 
     @staticmethod
-    def resource_uri():
+    def resource_uri(*args):
         return ('surface_form_handler', ['language_id', 'text'])
     example_args = {'lang': 'en', 'text': 'have%20webbed%20feet'}
 
@@ -291,7 +291,7 @@ class FrameHandler(BaseHandler):
             return rc.NOT_FOUND
 
     @staticmethod
-    def resource_uri():
+    def resource_uri(*args):
         return ('frame_handler', ['language_id', 'id'])
     example_args = {'lang': 'en', 'id': '7'}
 
@@ -318,7 +318,7 @@ class AssertionHandler(BaseHandler):
             return rc.NOT_FOUND
 
     @staticmethod
-    def resource_uri():
+    def resource_uri(*args):
         return ('assertion_handler', ['language_id', 'id'])
     example_args = {'lang': 'en', 'id': '25'}
 
@@ -333,7 +333,7 @@ class AssertionToRawHandler(BaseHandler):
         return raw_list
 
     @staticmethod
-    def resource_uri():
+    def resource_uri(*args):
         return ('assertion_to_raw_handler', ['language_id', 'assertion_id'])
     example_args = {'lang': 'en',
                     'id': 31445}
@@ -375,7 +375,7 @@ class AssertionFindHandler(BaseHandler):
 
         
     @staticmethod
-    def resource_uri():
+    def resource_uri(*args):
         return ('assertion_find_handler', ['language_id', 'relation', 'text1', 'text2'])
     example_args = {'lang': 'en', 'relation': 'IsA', 'text1': 'dog', 'text2': 'animal'}
 
@@ -450,7 +450,7 @@ class RatedObjectHandler(BaseHandler):
             return rc.BAD_REQUEST
 
     @staticmethod
-    def resource_uri():
+    def resource_uri(*args):
         return ('rated_object_handler', ['type', 'language_id', 'id'])
     example_args = {'type': 'assertion', 'lang': 'en', 'id': '25'}
 
@@ -521,7 +521,7 @@ class RawAssertionHandler(BaseHandler):
             return rc.NOT_FOUND
 
     @staticmethod
-    def resource_uri():
+    def resource_uri(*args):
         return ('raw_assertion_handler', ['language_id', 'id'])
     example_args = {'lang': 'en', 'id': '26'}
     
@@ -574,7 +574,7 @@ class RawAssertionByFrameHandler(BaseHandler):
         return raw
 
     @staticmethod
-    def resource_uri():
+    def resource_uri(*args):
         return ('raw_assertion_by_frame_handler', ['language_id', 'id', 'limit'])
 
 class SentenceHandler(BaseHandler):
@@ -633,15 +633,15 @@ class SimilarityHandler(BaseHandler):
             if score > 0:
                 result = {
                     'concept': Concept.objects.get(text=concept, language__id='en'),
-                    'score': score
+                    'score': float(score)
                 }
                 results.append(result)
         return results
 
     @staticmethod
-    def resource_uri():
-        return ('similarity_handler', ['language_id', 'terms', 'limit'])
+    def resource_uri(*args):
+        return ('similarity_handler', ['language_id', 'termlist', 'limit'])
     
-    example_args = {'lang': 'en', 'terms': 'dog,cat,mouse@0.5,guinea_pig', 'limit': '10'}
+    example_args = {'lang': 'en', 'termlist': 'dog,cat,mouse@0.5,guinea_pig', 'limit': '10'}
     
 
