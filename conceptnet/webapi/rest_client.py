@@ -86,15 +86,12 @@ def lookup_concept_from_surface(language, surface_text):
 def lookup_concept_from_nl(language, text):
     """
     Look up a concept using any natural language text that represents it.
-    This function requires the :mod:`simplenlp` module, or the `standalone_nlp`
-    version of it, to normalize natural language text into a raw concept name
+    This function requires the :mod:`simplenlp` module
+    to normalize natural language text into a raw concept name.
     """
-    try:
-        from csc import nl
-    except ImportError:
-        import standalone_nlp as nl
+    import simplenlp
+    nltools = simplenlp.get('en')
 
-    nltools = nl.get_nl(language)
     normalized = nltools.normalize(text)
     return lookup_concept_raw(language, normalized)
 
@@ -141,6 +138,22 @@ def votes_for(obj):
     """
     return _refine_json(obj, 'votes')
 
+def similar_to_concepts(concepts, limit=20):
+    pieces = []
+    for entry in concepts:
+        if isinstance(entry, tuple):
+            concept, weight = entry
+        else:
+            concept = entry
+            weight = 1.
+        if hasattr(concept, 'text'):
+            concept = concept.text
+        concept = concept.replace(' ', '_').encode('utf-8')
+        pieces.append("%s@%s" % (concept, weight))
+    termlist = ','.join(pieces)
+    limitstr = 'limit:%d' % limit
+    return _get_json('en', 'similar_to', termlist, limitstr)
+
 def add_statement(language, frame_id, text1, text2, username, password):
     """
     Add a statement to Open Mind, or vote for it if it is there.
@@ -175,6 +188,7 @@ def add_statement(language, frame_id, text1, text2, username, password):
         'text1': text1,
         'text2': text2
     })
+
 
 def _get_json(*url_parts):
     url = API_URL + '/'.join(urllib2.quote(str(p)) for p in url_parts) + '/query.json'
