@@ -13,7 +13,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from functools import wraps
 
-BASE = "http://openmind.media.mit.edu/api/"
+BASE = "http://openmind.media.mit.edu/"
 basic_auth = HttpBasicAuthentication()
 
 class LanguageHandler(BaseHandler):

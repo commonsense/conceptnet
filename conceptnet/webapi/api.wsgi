@@ -11,7 +11,9 @@ from os.path import abspath, dirname, join
 from site import addsitedir
 
 addsitedir('/srv/conceptnet/lib/python2.6/site-packages')
-sys.path.insert('/srv/conceptnet/conceptnet')
+addsitedir('/usr/lib/pymodules/python2.6')
+sys.path.insert(0, '/srv/conceptnet')
+sys.path.insert(0, '/srv/conceptnet/conceptnet')
 from django.conf import settings
 os.environ["DJANGO_SETTINGS_MODULE"] = "conceptnet.django_settings"
 
