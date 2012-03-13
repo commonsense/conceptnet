@@ -582,5 +582,66 @@ class SentenceHandler(BaseHandler):
     model = Sentence
     fields = ('text', 'creator', 'language', 'score', 'created_on')
 
+import divisi2
+import numpy as np
+assoc_matrix = divisi2.network.conceptnet_assoc('en')
+assocU, assocS, assocV = assoc_matrix.normalize_all().svd(k=150)
+assoc_power = np.exp(assocS)
 
+class SimilarityHandler(BaseHandler):
+    """
+    A GET request to this URL will take in a comma-separated list of concept
+    names, and return a list of concepts that are the most similar.
+    The concept names can have underscores that are translated
+    to spaces, and @ signs that indicate a weight. For example:
+
+        /api/en/similar_to/dog,cat,mouse@0.5,guinea_pig/limit:10
+    
+    The first argument is the language, and the second argument is the list
+    of terms. The language must currently be 'en'.
+    """
+    allowed_methods = ('GET',)
+
+    @throttle(60, 60, 'read')
+    def read(self, request, lang, termlist, limit=20):
+        limit = int(limit)
+        if limit > 100: limit=20
+        terms = []
+        try:
+            term_pieces = termlist.split(',')
+            for piece in term_pieces:
+                if '@' in piece:
+                    term, weight = piece.split('@')
+                    weight = float(weight)
+                else:
+                    term = piece
+                    weight = 1.
+                term = term.replace('_', ' ')
+                terms.append((term, weight))
+        except ValueError:
+            return rc.BAD_REQUEST
+        
+        vec = np.zeros((150,))
+        for term, weight in terms:
+            if term in assocU.row_labels:
+                vec += np.asarray(assocU.row_named(term)) * assoc_power * weight
+        similar = assocU.dot(divisi2.DenseVector(vec))
+        top_items = similar.top_items(limit)
+
+        results = []
+        for concept, score in top_items:
+            if score > 0:
+                result = {
+                    'concept': Concept.objects.get(name=concept, language__id='en'),
+                    'score': score
+                }
+                results.append(result)
+        return results
+
+    @staticmethod
+    def resource_uri():
+        return ('similarity_handler', ['language_id', 'terms', 'limit'])
+    
+    example_args = {'lang': 'en', 'terms': 'dog,cat,mouse@0.5,guinea_pig', 'limit': '10'}
+    
 

@@ -50,6 +50,10 @@ urlpatterns = patterns('',
         Resource(AssertionFindHandler), name='assertion_find_handler'),
     url(r'^user/(?P<username>.+)/'+Q,
         Resource(UserHandler), name='user_handler'),
+    url(r'^(?P<lang>.+)/similar_to/(?P<termlist>[^/]+)/limit:(?P<limit>[0-9]+)/'+Q,
+        Resource(SimilarityHandler), name='similarity_handler'),
+    url(r'^(?P<lang>.+)/similar_to/(?P<termlist>[^/]+)/'+Q,
+        Resource(SimilarityHandler), name='similarity_handler_default'),
     url(r'docs.txt$',
         documentation_view, name='documentation_view')
 )
