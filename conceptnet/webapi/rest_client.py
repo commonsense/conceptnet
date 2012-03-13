@@ -139,6 +139,17 @@ def votes_for(obj):
     return _refine_json(obj, 'votes')
 
 def similar_to_concepts(concepts, limit=20):
+    """
+    `concepts` is a list of concept names or (concept name, weight) pairs.
+    Given this, `similar_to_concepts` will find the `limit` most related
+    concepts.
+
+    These similar concepts are returned in dictionaries of the form:
+
+        {'concept': concept, 'score': score}
+
+    where `concept` is the data structure for a concept.
+    """
     pieces = []
     for entry in concepts:
         if isinstance(entry, tuple):
