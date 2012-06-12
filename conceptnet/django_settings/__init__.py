@@ -75,6 +75,18 @@ DATABASE_HOST = get_db_config('HOST', '')        # Set to empty string for local
 DATABASE_PORT = get_db_config('PORT', '')        # Set to empty string for default. Not used with sqlite3.
 DATABASE_OPTIONS = get_db_config('OPTIONS', {})
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.'+DATABASE_ENGINE,
+        'NAME': DATABASE_NAME,
+        'USER': DATABASE_USER,
+        'PASSWORD': DATABASE_PASSWORD,
+        'HOST': DATABASE_HOST,
+        'PORT': DATABASE_PORT,
+        'OPTIONS': DATABASE_OPTIONS
+    }
+}
+
 # Local time zone for this installation. All choices can be found here:
 # http://www.postgresql.org/docs/current/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
 TIME_ZONE = 'America/New_York'
